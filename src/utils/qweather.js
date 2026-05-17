@@ -58,7 +58,7 @@ async function fetchJsonResponse(url) {
   let data;
   try {
     data = JSON.parse(text);
-  } catch (e) {
+  } catch {
     data = text;
   }
 

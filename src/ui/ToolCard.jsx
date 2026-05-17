@@ -40,7 +40,7 @@ function ToolCard({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 8 }}
-      whileHover={{ scale: 1.01, y: -1 }}
+      whileHover={{ scale: 1.012, y: -2 }}
       transition={{
         ...motionTransition,
         delay: Math.min(index * 0.02, 0.1),
@@ -66,10 +66,18 @@ function ToolCard({
           onClick={() => onToggleFavorite(tool.id)}
           aria-label={favorited ? `取消收藏 ${tool.name}` : `收藏 ${tool.name}`}
           title={favorited ? "取消收藏" : "收藏"}
-          whileTap={{ scale: 0.96 }}
-          transition={motionTapTransition}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.92 }}
+          transition={motionHoverTransition}
         >
-          <StarIcon filled={favorited} />
+          <motion.span
+            animate={{
+              scale: favorited ? 1.08 : 1,
+            }}
+            transition={motionTapTransition}
+          >
+            <StarIcon filled={favorited} />
+          </motion.span>
         </motion.button>
       </div>
 

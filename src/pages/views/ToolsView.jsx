@@ -2,7 +2,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import {
   motionHoverTransition,
-  motionTapTransition,
   motionTransition,
 } from "../../utils/motion";
 import { TOOL_CATEGORIES, TOOLS } from "../../data/tools";

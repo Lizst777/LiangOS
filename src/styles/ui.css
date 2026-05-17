@@ -324,34 +324,23 @@
   grid-column: span 12;
 }
 
-/* Tablet: 2 columns */
-@media (max-width: 768px) {
+@media (max-width: 1023px) {
   .bento {
+    grid-template-columns: 1fr;
     gap: var(--space-4);
-  }
-
-  .bento__span-8,
-  .bento__span-4,
-  .bento__span-6 {
-    grid-column: span 6;
-  }
-
-  .bento__span-12 {
-    grid-column: span 12;
-  }
-}
-
-/* Mobile: 1 column */
-@media (max-width: 640px) {
-  .bento {
-    gap: var(--space-3);
   }
 
   .bento__span-8,
   .bento__span-4,
   .bento__span-6,
   .bento__span-12 {
-    grid-column: span 12;
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .bento {
+    gap: var(--space-3);
   }
 }
 
@@ -498,6 +487,7 @@
 .system-status-card__details {
   display: grid;
   gap: var(--space-4);
+  overflow: hidden;
 }
 
 .system-status-card__detail-group {
@@ -750,10 +740,21 @@
   }
 
   .weather-card__current {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     gap: var(--space-3);
     padding: var(--space-3);
+  }
+
+  .weather-card__main-left,
+  .weather-card__main-right {
+    min-width: 0;
+  }
+
+  .weather-card__main-right {
+    text-align: right;
+    flex-shrink: 0;
   }
 
   .weather-card__temp {
@@ -798,7 +799,18 @@
   }
 
   .weather-card__current {
+    flex-wrap: wrap;
     gap: var(--space-2);
+  }
+
+  .time-card__hours,
+  .time-card__minutes,
+  .time-card__seconds {
+    font-size: 2.25rem;
+  }
+
+  .time-card__separator {
+    font-size: 1.75rem;
   }
 
   .weather-card__grid {
@@ -809,5 +821,11 @@
   .weather-card__item {
     padding: var(--space-2);
     gap: 2px;
+    min-width: 0;
+  }
+
+  .weather-card__value {
+    overflow-wrap: anywhere;
+    white-space: normal;
   }
 }

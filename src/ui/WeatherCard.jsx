@@ -41,7 +41,7 @@ function WeatherCard() {
 
         const { latitude, longitude } = position.coords;
         await loadByCoords(latitude, longitude);
-      } catch (err) {
+      } catch {
         try {
           await loadByCoords(35.6895, 139.6917); // 东京（lon,lat）
           setIsDefault(true);

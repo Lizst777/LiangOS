@@ -2,6 +2,7 @@ import PageHeader from "../components/layout/PageHeader";
 import PageTransition from "../components/layout/PageTransition";
 import Sidebar from "../components/layout/Sidebar";
 import BottomNavigation from "../components/layout/BottomNavigation";
+import MobileHeader from "../components/layout/MobileHeader";
 import DashboardView from "./views/DashboardView";
 import NotesView from "./views/NotesView";
 import SearchView from "./views/SearchView";
@@ -44,6 +45,7 @@ function DashboardShell({
         onLogout={onLogout}
       />
       <main className="main">
+        <MobileHeader page={currentPage} />
         <PageHeader page={currentPage} username={username} />
         <PageTransition pageKey={currentPage}>{renderView()}</PageTransition>
       </main>

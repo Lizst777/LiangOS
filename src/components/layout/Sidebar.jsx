@@ -10,7 +10,9 @@ import {
 
 function Sidebar({ page, theme, onPageChange, onThemeToggle, onLogout }) {
   const [collapsed, setCollapsed] = useState(false);
-  const sidebarClass = collapsed ? "sidebar sidebar--collapsed" : "sidebar";
+  const sidebarClass = collapsed
+    ? "sidebar hidden lg:flex sidebar--collapsed"
+    : "sidebar hidden lg:flex";
 
   return (
     <aside className={sidebarClass}>

@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import {
   SYSTEM_CORE_STATUS,
@@ -6,6 +7,7 @@ import {
 import Card from "../../ui/Card";
 import InfoRow from "../../ui/InfoRow";
 import StatBlock from "../../ui/StatBlock";
+import { motionPanelTransition } from "../../utils/motion";
 
 function StatusView() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -58,29 +60,37 @@ function StatusView() {
             {isExpanded ? "收起详情" : "查看更多配置"}
           </button>
 
-          {isExpanded && (
-            <div className="system-status-card__details">
-              {SYSTEM_DETAIL_GROUPS.map((group) => (
-                <section
-                  key={group.title}
-                  className="system-status-card__detail-group"
-                >
-                  <h3 className="system-status-card__section-title">
-                    {group.title}
-                  </h3>
-                  <div className="system-status-card__rows">
-                    {group.items.map((item) => (
-                      <InfoRow
-                        key={item.label}
-                        label={item.label}
-                        value={item.value}
-                      />
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
-          )}
+          <AnimatePresence initial={false}>
+            {isExpanded && (
+              <motion.div
+                className="system-status-card__details"
+                initial={{ opacity: 0, height: 0, y: -6 }}
+                animate={{ opacity: 1, height: "auto", y: 0 }}
+                exit={{ opacity: 0, height: 0, y: -4 }}
+                transition={motionPanelTransition}
+              >
+                {SYSTEM_DETAIL_GROUPS.map((group) => (
+                  <section
+                    key={group.title}
+                    className="system-status-card__detail-group"
+                  >
+                    <h3 className="system-status-card__section-title">
+                      {group.title}
+                    </h3>
+                    <div className="system-status-card__rows">
+                      {group.items.map((item) => (
+                        <InfoRow
+                          key={item.label}
+                          label={item.label}
+                          value={item.value}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </Card>
       </section>
     </section>

@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { motionTransition } from "../../utils/motion";
+import { motionPanelTransition } from "../../utils/motion";
 
 function PageTransition({ pageKey, children }) {
   return (
@@ -7,10 +7,10 @@ function PageTransition({ pageKey, children }) {
       <motion.div
         key={pageKey}
         className="page-content"
-        initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+        initial={{ opacity: 0, y: 10, filter: "blur(5px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        exit={{ opacity: 0, y: -8, filter: "blur(2px)" }}
-        transition={motionTransition}
+        exit={{ opacity: 0, y: -6, filter: "blur(3px)" }}
+        transition={motionPanelTransition}
       >
         {children}
       </motion.div>
