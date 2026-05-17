@@ -4,14 +4,13 @@ export const NAV_ITEMS = [
   { id: "tools", label: "工具发现", icon: "compass" },
   { id: "music", label: "音乐空间", icon: "music" },
   { id: "notes", label: "私人备忘录", icon: "note" },
-  { id: "projects", label: "项目空间", icon: "folder" },
   { id: "status", label: "系统状态", icon: "activity" },
 ];
 
 export const PAGE_META = {
   dashboard: {
     title: "总览",
-    description: "系统概览与快捷入口",
+    description: "实时时间与天气信息",
   },
   search: {
     title: "搜索中心",
@@ -28,10 +27,6 @@ export const PAGE_META = {
   notes: {
     title: "私人备忘录",
     description: "加密存储的个人笔记",
-  },
-  projects: {
-    title: "项目空间",
-    description: "进行中的项目与作品",
   },
   status: {
     title: "系统状态",

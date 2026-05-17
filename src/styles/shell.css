@@ -252,10 +252,28 @@
 
 .page-header h1 {
   font-size: var(--font-2xl);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.03em;
   color: var(--os-text);
   margin-bottom: var(--space-2);
+}
+
+.page-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.page-header__desc {
+  color: var(--os-text-secondary);
+  font-size: var(--font-base);
+  margin-bottom: var(--space-2);
+  max-width: 760px;
+}
+
+.page-header__meta {
+  color: var(--os-muted);
+  font-size: var(--font-sm);
 }
 
 .page-header__desc {

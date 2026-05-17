@@ -3,7 +3,6 @@ import PageTransition from "../components/layout/PageTransition";
 import Sidebar from "../components/layout/Sidebar";
 import DashboardView from "./views/DashboardView";
 import NotesView from "./views/NotesView";
-import ProjectsView from "./views/ProjectsView";
 import SearchView from "./views/SearchView";
 import ToolsView from "./views/ToolsView";
 import Music from "./Music";
@@ -27,8 +26,6 @@ function DashboardShell({
         return <Music />;
       case "notes":
         return <NotesView />;
-      case "projects":
-        return <ProjectsView />;
       case "status":
         return <StatusView />;
       default:
