@@ -48,7 +48,9 @@ function WeatherCard() {
           setLocationName("东京");
         } catch (fallbackErr) {
           console.error("Weather fallback error:", fallbackErr);
-          setError("天气暂不可用");
+          const statusCode = fallbackErr?.status || "unknown";
+          const code = fallbackErr?.body?.code || "none";
+          setError(`天气暂不可用：HTTP ${statusCode} / code ${code}`);
         }
       } finally {
         setLoading(false);

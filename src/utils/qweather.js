@@ -122,7 +122,7 @@ export async function getQWeatherLocationName(longitude, latitude) {
 
   for (const host of geoHosts) {
     const url = `${host}/geo/v2/city/lookup?location=${longitude},${latitude}&key=${QWEATHER_KEY}&lang=zh`;
-    console.log("QWeather Geo try:", url);
+    console.log("QWeather Geo try:", url.replace(QWEATHER_KEY, "***"));
 
     let res;
     let data;
@@ -137,7 +137,8 @@ export async function getQWeatherLocationName(longitude, latitude) {
       continue;
     }
 
-    console.log("QWeather Geo result:", res.status, data);
+    console.log("QWeather Geo status:", res.status);
+    console.log("QWeather Geo body:", data);
 
     if (res.status === 404) {
       continue;

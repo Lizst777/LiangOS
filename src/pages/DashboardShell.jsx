@@ -1,6 +1,7 @@
 import PageHeader from "../components/layout/PageHeader";
 import PageTransition from "../components/layout/PageTransition";
 import Sidebar from "../components/layout/Sidebar";
+import BottomNavigation from "../components/layout/BottomNavigation";
 import DashboardView from "./views/DashboardView";
 import NotesView from "./views/NotesView";
 import SearchView from "./views/SearchView";
@@ -46,6 +47,7 @@ function DashboardShell({
         <PageHeader page={currentPage} username={username} />
         <PageTransition pageKey={currentPage}>{renderView()}</PageTransition>
       </main>
+      <BottomNavigation page={currentPage} onPageChange={onPageChange} />
     </section>
   );
 }
