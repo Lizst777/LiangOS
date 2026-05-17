@@ -291,8 +291,9 @@
   }
 
   .main {
-    padding: var(--space-4) var(--space-4) 7rem;
+    width: 100%;
     max-width: 100%;
+    padding: var(--space-4) var(--space-4) 7rem;
   }
 
   .page-header {
@@ -307,6 +308,10 @@
   .page-header__desc {
     font-size: var(--font-sm);
   }
+
+  .bottom-nav {
+    display: block;
+  }
 }
 
 /* BottomNavigation for mobile */
@@ -317,12 +322,6 @@
   left: 0;
   right: 0;
   z-index: 40;
-}
-
-@media (max-width: 768px) {
-  .bottom-nav {
-    display: block;
-  }
 }
 
 .bottom-nav__container {
