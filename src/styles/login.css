@@ -1,9 +1,10 @@
 .login-page {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--space-10);
+  padding-bottom: max(var(--space-10), env(safe-area-inset-bottom));
   background: radial-gradient(
       circle at 18% 10%,
       var(--os-login-grad-1),

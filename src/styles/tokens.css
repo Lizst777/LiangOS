@@ -1,4 +1,4 @@
-/* Design tokens — Apple / Linear / Notion */
+/* Design tokens - Apple / Linear / Notion */
 .liangos-app {
   --space-1: 4px;
   --space-2: 8px;
@@ -31,32 +31,32 @@
   --sidebar-width: 248px;
   --sidebar-collapsed: 72px;
 
-  --os-body: #f4f5f7;
-  --os-text: #0f172a;
+  --os-body: #eef3f8;
+  --os-text: #182033;
   --os-text-secondary: #334155;
-  --os-muted: #64748b;
-  --os-muted-paragraph: #475569;
-  --os-border: rgba(15, 23, 42, 0.08);
-  --os-border-subtle: rgba(15, 23, 42, 0.05);
+  --os-muted: #6b788d;
+  --os-muted-paragraph: #536174;
+  --os-border: rgba(255, 255, 255, 0.46);
+  --os-border-subtle: rgba(255, 255, 255, 0.3);
   --os-border-input: rgba(15, 23, 42, 0.12);
-  --os-surface: rgba(255, 255, 255, 0.72);
-  --os-surface-raised: rgba(255, 255, 255, 0.92);
-  --os-surface-solid: #ffffff;
-  --os-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
-  --os-shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
-  --os-shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
-  --os-shadow-lg: 0 20px 48px rgba(15, 23, 42, 0.1);
-  --os-blur: blur(20px);
+  --os-surface: rgba(255, 255, 255, 0.56);
+  --os-surface-raised: rgba(255, 255, 255, 0.68);
+  --os-surface-solid: rgba(255, 255, 255, 0.82);
+  --os-shadow-xs: 0 1px 2px rgba(30, 41, 59, 0.04);
+  --os-shadow-sm: 0 8px 20px rgba(30, 41, 59, 0.06);
+  --os-shadow-md: 0 18px 48px rgba(30, 41, 59, 0.09);
+  --os-shadow-lg: 0 28px 80px rgba(30, 41, 59, 0.12);
+  --os-blur: blur(28px);
   --os-login-grad-1: rgba(191, 219, 254, 0.35);
   --os-login-grad-2: rgba(221, 214, 254, 0.3);
-  --os-dash-bg: #f4f5f7;
-  --os-sidebar-bg: rgba(255, 255, 255, 0.8);
-  --os-sidebar-divider: rgba(15, 23, 42, 0.06);
-  --os-nav-hover: rgba(15, 23, 42, 0.04);
-  --os-nav-active-bg: #0f172a;
+  --os-dash-bg: #eef3f8;
+  --os-sidebar-bg: rgba(255, 255, 255, 0.48);
+  --os-sidebar-divider: rgba(255, 255, 255, 0.36);
+  --os-nav-hover: rgba(255, 255, 255, 0.5);
+  --os-nav-active-bg: rgba(24, 32, 51, 0.82);
   --os-nav-active-color: #ffffff;
-  --os-nav-active-shadow: 0 1px 2px rgba(15, 23, 42, 0.12),
-    0 4px 12px rgba(15, 23, 42, 0.12);
+  --os-nav-active-shadow: 0 1px 2px rgba(15, 23, 42, 0.08),
+    0 10px 24px rgba(15, 23, 42, 0.12);
   --os-nav-indicator: #ffffff;
   --os-logout-bg: rgba(15, 23, 42, 0.04);
   --os-logout-color: #0f172a;
@@ -76,8 +76,11 @@
   --os-theme-toggle-hover: rgba(15, 23, 42, 0.07);
   --os-stat-positive: #16a34a;
 
-  min-height: 100vh;
-  background: var(--os-body);
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(191, 219, 254, 0.48), transparent 34%),
+    radial-gradient(circle at 88% 18%, rgba(226, 232, 240, 0.68), transparent 32%),
+    linear-gradient(145deg, #f8fafc 0%, #edf3f9 46%, #e8eef6 100%);
   color: var(--os-text);
   color-scheme: light;
   font-size: var(--font-base);
@@ -87,28 +90,28 @@
 
 .liangos-app.theme-dark {
   --os-body: #09090b;
-  --os-text: #fafafa;
+  --os-text: #f4f6fb;
   --os-text-secondary: #d4d4d8;
   --os-muted: #a1a1aa;
   --os-muted-paragraph: #a1a1aa;
-  --os-border: rgba(255, 255, 255, 0.08);
-  --os-border-subtle: rgba(255, 255, 255, 0.04);
+  --os-border: rgba(255, 255, 255, 0.14);
+  --os-border-subtle: rgba(255, 255, 255, 0.08);
   --os-border-input: rgba(255, 255, 255, 0.1);
-  --os-surface: rgba(24, 24, 27, 0.65);
-  --os-surface-raised: rgba(30, 30, 33, 0.88);
-  --os-surface-solid: rgba(24, 24, 27, 0.95);
+  --os-surface: rgba(255, 255, 255, 0.06);
+  --os-surface-raised: rgba(255, 255, 255, 0.08);
+  --os-surface-solid: rgba(24, 24, 27, 0.74);
   --os-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
   --os-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
   --os-shadow-md: 0 8px 28px rgba(0, 0, 0, 0.35);
   --os-shadow-lg: 0 24px 56px rgba(0, 0, 0, 0.45);
-  --os-blur: blur(24px);
+  --os-blur: blur(30px);
   --os-login-grad-1: rgba(59, 130, 246, 0.12);
   --os-login-grad-2: rgba(124, 58, 237, 0.1);
   --os-dash-bg: #09090b;
-  --os-sidebar-bg: rgba(18, 18, 20, 0.85);
-  --os-sidebar-divider: rgba(255, 255, 255, 0.06);
-  --os-nav-hover: rgba(255, 255, 255, 0.06);
-  --os-nav-active-bg: rgba(255, 255, 255, 0.1);
+  --os-sidebar-bg: rgba(18, 18, 20, 0.58);
+  --os-sidebar-divider: rgba(255, 255, 255, 0.1);
+  --os-nav-hover: rgba(255, 255, 255, 0.07);
+  --os-nav-active-bg: rgba(255, 255, 255, 0.13);
   --os-nav-active-color: #fafafa;
   --os-nav-active-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08),
     0 4px 16px rgba(0, 0, 0, 0.35);
@@ -132,4 +135,8 @@
   --os-stat-positive: #4ade80;
 
   color-scheme: dark;
+  background:
+    radial-gradient(circle at 16% 8%, rgba(59, 130, 246, 0.18), transparent 32%),
+    radial-gradient(circle at 84% 12%, rgba(148, 163, 184, 0.08), transparent 30%),
+    linear-gradient(145deg, #08090d 0%, #0d1119 52%, #09090b 100%);
 }

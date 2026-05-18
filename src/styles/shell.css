@@ -1,7 +1,7 @@
 .app-shell {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
-  background: var(--os-dash-bg);
+  background: transparent;
   overflow-x: hidden;
 }
 
@@ -11,6 +11,7 @@
   padding: var(--space-5) var(--space-4);
   background: var(--os-sidebar-bg);
   border-right: 1px solid var(--os-sidebar-divider);
+  box-shadow: inset -1px 0 rgba(255, 255, 255, 0.12);
   display: flex;
   flex-direction: column;
   backdrop-filter: var(--os-blur);
@@ -43,13 +44,13 @@
   align-items: center;
   justify-content: center;
   font-size: var(--font-sm);
-  font-weight: 700;
+  font-weight: 650;
   letter-spacing: -0.02em;
 }
 
 .sidebar__logo-text {
   font-size: var(--font-lg);
-  font-weight: 700;
+  font-weight: 650;
   letter-spacing: -0.03em;
   color: var(--os-text);
   white-space: nowrap;
@@ -86,7 +87,7 @@
   background: transparent;
   color: var(--os-muted);
   font-size: var(--font-sm);
-  font-weight: 600;
+  font-weight: 560;
   cursor: pointer;
   text-align: left;
   transition: background var(--duration-fast) var(--ease-out),
@@ -117,8 +118,8 @@
   left: 4px;
   top: 50%;
   transform: translateY(-50%);
-  width: 3px;
-  height: 18px;
+  width: 2px;
+  height: 16px;
   border-radius: 99px;
   background: var(--os-nav-indicator);
 }
@@ -252,13 +253,13 @@
 
 .page-header {
   margin-bottom: var(--space-6);
-  padding-bottom: var(--space-6);
+  padding: var(--space-1) var(--space-1) var(--space-6);
   border-bottom: 1px solid var(--os-border-subtle);
 }
 
 .page-header h1 {
   font-size: clamp(1.5rem, 5vw, 2rem);
-  font-weight: 700;
+  font-weight: 650;
   letter-spacing: -0.03em;
   color: var(--os-text);
   margin-bottom: var(--space-2);
@@ -271,7 +272,7 @@
 }
 
 .page-header__desc {
-  color: var(--os-text-secondary);
+  color: var(--os-muted-paragraph);
   font-size: clamp(0.875rem, 2vw, 1rem);
   margin-bottom: var(--space-2);
   max-width: 760px;
@@ -323,24 +324,25 @@
     padding: max(env(safe-area-inset-top), var(--space-3)) var(--space-4)
       var(--space-3);
     border-bottom: 1px solid var(--os-border-subtle);
-    background: color-mix(in srgb, var(--os-dash-bg) 82%, transparent);
+    background: color-mix(in srgb, var(--os-surface-solid) 58%, transparent);
     backdrop-filter: var(--os-blur);
     -webkit-backdrop-filter: var(--os-blur);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04);
   }
 
   .mobile-header__brand,
   .mobile-header__status {
     color: var(--os-muted);
     font-size: var(--font-xs);
-    font-weight: 700;
-    letter-spacing: 0;
+    font-weight: 560;
+    letter-spacing: 0.02em;
   }
 
   .mobile-header__title {
     margin-top: 2px;
     color: var(--os-text);
     font-size: var(--font-lg);
-    font-weight: 750;
+    font-weight: 650;
     letter-spacing: -0.02em;
     line-height: 1.2;
   }
@@ -376,59 +378,60 @@
 .bottom-nav {
   display: none;
   position: fixed;
-  bottom: var(--space-4);
+  bottom: max(env(safe-area-inset-bottom), var(--space-3));
   left: var(--space-4);
   right: var(--space-4);
   z-index: 80;
 }
 
 .bottom-nav__container {
-  padding: var(--space-2);
-  border-radius: 24px;
-  background: color-mix(in srgb, var(--os-surface-solid) 76%, transparent);
+  padding: 6px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--os-surface-solid) 64%, transparent);
   backdrop-filter: var(--os-blur);
   -webkit-backdrop-filter: var(--os-blur);
   border: 1px solid var(--os-border);
-  box-shadow: var(--os-shadow-lg);
+  box-shadow: 0 14px 42px rgba(15, 23, 42, 0.14);
   display: flex;
   justify-content: space-around;
-  gap: var(--space-1);
+  gap: 3px;
 }
 
 .theme-dark .bottom-nav__container {
-  background: rgba(18, 18, 20, 0.78);
+  background: rgba(18, 18, 20, 0.66);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.38);
 }
 
 .bottom-nav__item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   flex: 1;
-  padding: var(--space-2) var(--space-1);
+  padding: 6px 4px;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: 15px;
   background: transparent;
   color: var(--os-muted);
   cursor: pointer;
   transition: background var(--duration-fast) var(--ease-out),
     color var(--duration-fast) var(--ease-out),
     transform var(--duration-fast) var(--ease-out);
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 9px;
+  font-weight: 500;
   letter-spacing: -0.01em;
 }
 
 .bottom-nav__item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--os-nav-hover);
   color: var(--os-text);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .bottom-nav__item--active {
   background: var(--os-nav-active-bg);
   color: var(--os-nav-active-color);
-  box-shadow: var(--os-nav-active-shadow);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 .bottom-nav__item--active:hover {
@@ -439,8 +442,8 @@
 
 .bottom-nav__icon {
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -3,6 +3,19 @@ import { useEffect, useState } from "react";
 import { motionTransition } from "../utils/motion";
 import { fetchQWeather, getQWeatherLocationName } from "../utils/qweather";
 
+function formatTimeLabel(value, suffix) {
+  if (!value) return "--";
+
+  const date = value instanceof Date ? value : new Date(value);
+
+  if (Number.isNaN(date.getTime())) return "--";
+
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `${hours}:${minutes} ${suffix}`;
+}
+
 function WeatherCard() {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -43,7 +56,7 @@ function WeatherCard() {
         await loadByCoords(latitude, longitude);
       } catch {
         try {
-          await loadByCoords(35.6895, 139.6917); // 东京（lon,lat）
+          await loadByCoords(35.6895, 139.6917);
           setIsDefault(true);
           setLocationName("东京");
         } catch (fallbackErr) {
@@ -88,6 +101,9 @@ function WeatherCard() {
 
   if (!weather) return null;
 
+  const observedAt = formatTimeLabel(weather.obsTime, "更新");
+  const refreshedAt = formatTimeLabel(localRefreshedAt, "刷新");
+
   return (
     <motion.section
       className="ui-surface ui-card weather-card"
@@ -100,19 +116,14 @@ function WeatherCard() {
         <div>
           <h3 className="weather-card__title">天气</h3>
           <p className="weather-card__location">{locationName}</p>
-          {isDefault && (
-            <p className="weather-card__note">默认城市：东京</p>
-          )}
+          {isDefault && <p className="weather-card__note">默认城市：东京</p>}
         </div>
-        <div className="weather-card__updated">&nbsp;</div>
       </div>
 
       <div className="weather-card__current">
         <div className="weather-card__main-left">
-          <div>
-            <span className="weather-card__temp">{weather.temperature}°</span>
-            <div className="weather-card__description">{weather.weatherText}</div>
-          </div>
+          <span className="weather-card__temp">{weather.temperature}°</span>
+          <div className="weather-card__description">{weather.weatherText}</div>
         </div>
 
         <div className="weather-card__main-right">
@@ -132,11 +143,15 @@ function WeatherCard() {
         </div>
         <div className="weather-card__item">
           <span className="weather-card__label">观测时间</span>
-          <span className="weather-card__value">{weather.obsTime}</span>
+          <span className="weather-card__value weather-card__value--muted">
+            {observedAt}
+          </span>
         </div>
         <div className="weather-card__item">
           <span className="weather-card__label">本地刷新</span>
-          <span className="weather-card__value">{localRefreshedAt?.toLocaleString()}</span>
+          <span className="weather-card__value weather-card__value--muted">
+            {refreshedAt}
+          </span>
         </div>
       </div>
 

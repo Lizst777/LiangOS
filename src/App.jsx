@@ -48,7 +48,7 @@ function App() {
     setCurrentPage("dashboard");
   }
 
-  const shellClass = `liangos-app min-h-screen overflow-x-hidden antialiased selection:bg-sky-500/20 ${
+  const shellClass = `liangos-app min-h-[100dvh] overflow-x-hidden antialiased selection:bg-sky-500/20 ${
     theme === "dark" ? "theme-dark" : "theme-light"
   }`;
 
