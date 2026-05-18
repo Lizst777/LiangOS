@@ -1,4 +1,30 @@
 /* Design tokens - Apple / Linear / Notion */
+:root {
+  --app-bg: #eef3f8;
+  --panel-bg: rgba(255, 255, 255, 0.56);
+  --panel-bg-raised: rgba(255, 255, 255, 0.68);
+  --panel-bg-solid: rgba(255, 255, 255, 0.82);
+  --panel-border: rgba(255, 255, 255, 0.46);
+  --panel-border-soft: rgba(255, 255, 255, 0.3);
+  --text-main: #182033;
+  --text-muted: #6b788d;
+  --text-soft: #536174;
+  --dock-bg: rgba(255, 255, 255, 0.64);
+}
+
+:root[data-theme="dark"] {
+  --app-bg: #09090b;
+  --panel-bg: rgba(255, 255, 255, 0.06);
+  --panel-bg-raised: rgba(255, 255, 255, 0.08);
+  --panel-bg-solid: rgba(24, 24, 27, 0.74);
+  --panel-border: rgba(255, 255, 255, 0.14);
+  --panel-border-soft: rgba(255, 255, 255, 0.08);
+  --text-main: #f4f6fb;
+  --text-muted: #a1a1aa;
+  --text-soft: #a1a1aa;
+  --dock-bg: rgba(18, 18, 20, 0.66);
+}
+
 .liangos-app {
   --space-1: 4px;
   --space-2: 8px;
@@ -31,17 +57,17 @@
   --sidebar-width: 248px;
   --sidebar-collapsed: 72px;
 
-  --os-body: #eef3f8;
-  --os-text: #182033;
+  --os-body: var(--app-bg);
+  --os-text: var(--text-main);
   --os-text-secondary: #334155;
-  --os-muted: #6b788d;
-  --os-muted-paragraph: #536174;
-  --os-border: rgba(255, 255, 255, 0.46);
-  --os-border-subtle: rgba(255, 255, 255, 0.3);
+  --os-muted: var(--text-muted);
+  --os-muted-paragraph: var(--text-soft);
+  --os-border: var(--panel-border);
+  --os-border-subtle: var(--panel-border-soft);
   --os-border-input: rgba(15, 23, 42, 0.12);
-  --os-surface: rgba(255, 255, 255, 0.56);
-  --os-surface-raised: rgba(255, 255, 255, 0.68);
-  --os-surface-solid: rgba(255, 255, 255, 0.82);
+  --os-surface: var(--panel-bg);
+  --os-surface-raised: var(--panel-bg-raised);
+  --os-surface-solid: var(--panel-bg-solid);
   --os-shadow-xs: 0 1px 2px rgba(30, 41, 59, 0.04);
   --os-shadow-sm: 0 8px 20px rgba(30, 41, 59, 0.06);
   --os-shadow-md: 0 18px 48px rgba(30, 41, 59, 0.09);
@@ -88,6 +114,7 @@
   -webkit-font-smoothing: antialiased;
 }
 
+:root[data-theme="dark"] .liangos-app,
 .liangos-app.theme-dark {
   --os-body: #09090b;
   --os-text: #f4f6fb;

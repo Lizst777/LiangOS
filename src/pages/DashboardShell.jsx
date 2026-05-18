@@ -14,6 +14,7 @@ function DashboardShell({
   username,
   currentPage,
   theme,
+  resolvedTheme,
   onThemeToggle,
   onPageChange,
   onLogout,
@@ -40,12 +41,13 @@ function DashboardShell({
       <Sidebar
         page={currentPage}
         theme={theme}
+        resolvedTheme={resolvedTheme}
         onPageChange={onPageChange}
         onThemeToggle={onThemeToggle}
         onLogout={onLogout}
       />
       <main className="main">
-        <MobileHeader page={currentPage} />
+        <MobileHeader page={currentPage} theme={theme} onThemeToggle={onThemeToggle} />
         <PageHeader page={currentPage} username={username} />
         <PageTransition pageKey={currentPage}>{renderView()}</PageTransition>
       </main>

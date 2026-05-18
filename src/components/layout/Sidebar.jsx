@@ -1,18 +1,27 @@
 import { useState } from "react";
 import { NAV_ITEMS } from "../../constants/navigation";
+import { getThemeLabel } from "../../utils/theme";
 import {
   IconChevron,
   IconLogout,
+  IconMonitor,
   IconMoon,
   IconSun,
   NavIcon,
 } from "../../ui/Icons";
+
+function ThemeIcon({ theme }) {
+  if (theme === "light") return <IconSun />;
+  if (theme === "dark") return <IconMoon />;
+  return <IconMonitor />;
+}
 
 function Sidebar({ page, theme, onPageChange, onThemeToggle, onLogout }) {
   const [collapsed, setCollapsed] = useState(false);
   const sidebarClass = collapsed
     ? "sidebar hidden lg:flex sidebar--collapsed"
     : "sidebar hidden lg:flex";
+  const themeLabel = getThemeLabel(theme);
 
   return (
     <aside className={sidebarClass}>
@@ -47,7 +56,7 @@ function Sidebar({ page, theme, onPageChange, onThemeToggle, onLogout }) {
         <button
           type="button"
           className="sidebar__collapse"
-          onClick={() => setCollapsed((c) => !c)}
+          onClick={() => setCollapsed((current) => !current)}
           aria-label={collapsed ? "展开侧栏" : "折叠侧栏"}
           title={collapsed ? "展开侧栏" : "折叠侧栏"}
         >
@@ -56,14 +65,13 @@ function Sidebar({ page, theme, onPageChange, onThemeToggle, onLogout }) {
 
         <button
           type="button"
-          className="sidebar__action"
+          className="sidebar__action theme-cycle"
           onClick={onThemeToggle}
-          title={theme === "light" ? "深色模式" : "浅色模式"}
+          title={`主题：${themeLabel}`}
+          aria-label={`当前主题：${themeLabel}，点击切换`}
         >
-          {theme === "light" ? <IconMoon /> : <IconSun />}
-          <span className="sidebar__action-label">
-            {theme === "light" ? "深色模式" : "浅色模式"}
-          </span>
+          <ThemeIcon theme={theme} />
+          <span className="sidebar__action-label">{themeLabel}</span>
         </button>
 
         <button

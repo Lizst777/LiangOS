@@ -1,16 +1,13 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import DashboardShell from "./pages/DashboardShell";
 import LoginPage from "./pages/LoginPage";
-
-const THEME_STORAGE_KEY = "liangos-theme";
-
-function readStoredTheme() {
-  try {
-    return localStorage.getItem(THEME_STORAGE_KEY) === "dark" ? "dark" : "light";
-  } catch {
-    return "light";
-  }
-}
+import {
+  applyTheme,
+  getNextTheme,
+  getStoredTheme,
+  getSystemTheme,
+  setStoredTheme,
+} from "./utils/theme";
 
 function App() {
   const [username, setUsername] = useState("");
@@ -18,18 +15,37 @@ function App() {
   const [isLogin, setIsLogin] = useState(false);
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [message, setMessage] = useState("");
-  const [theme, setTheme] = useState(readStoredTheme);
+  const [theme, setTheme] = useState(() => {
+    const storedTheme = getStoredTheme();
+    applyTheme(storedTheme);
+    return storedTheme;
+  });
+  const [systemTheme, setSystemTheme] = useState(getSystemTheme);
+  const resolvedTheme = theme === "system" ? systemTheme : theme;
 
   useEffect(() => {
-    try {
-      localStorage.setItem(THEME_STORAGE_KEY, theme);
-    } catch {
-      /* ignore */
+    setStoredTheme(theme);
+    applyTheme(theme);
+
+    if (theme !== "system") return undefined;
+
+    const mediaQuery = window.matchMedia?.("(prefers-color-scheme: dark)");
+    if (!mediaQuery) return undefined;
+
+    function handleSystemThemeChange() {
+      setSystemTheme(getSystemTheme());
+      applyTheme("system");
     }
+
+    mediaQuery.addEventListener?.("change", handleSystemThemeChange);
+
+    return () => {
+      mediaQuery.removeEventListener?.("change", handleSystemThemeChange);
+    };
   }, [theme]);
 
   function toggleTheme() {
-    setTheme((t) => (t === "light" ? "dark" : "light"));
+    setTheme((currentTheme) => getNextTheme(currentTheme));
   }
 
   function login() {
@@ -49,7 +65,7 @@ function App() {
   }
 
   const shellClass = `liangos-app min-h-[100dvh] overflow-x-hidden antialiased selection:bg-sky-500/20 ${
-    theme === "dark" ? "theme-dark" : "theme-light"
+    resolvedTheme === "dark" ? "theme-dark" : "theme-light"
   }`;
 
   if (!isLogin) {
@@ -73,6 +89,7 @@ function App() {
         username={username}
         currentPage={currentPage}
         theme={theme}
+        resolvedTheme={resolvedTheme}
         onThemeToggle={toggleTheme}
         onPageChange={setCurrentPage}
         onLogout={logout}

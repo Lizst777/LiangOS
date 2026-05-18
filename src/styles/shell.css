@@ -330,8 +330,7 @@
     box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04);
   }
 
-  .mobile-header__brand,
-  .mobile-header__status {
+  .mobile-header__brand {
     color: var(--os-muted);
     font-size: var(--font-xs);
     font-weight: 560;
@@ -347,12 +346,37 @@
     line-height: 1.2;
   }
 
-  .mobile-header__status {
+  .mobile-header__theme {
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 30px;
     padding: var(--space-1) var(--space-2);
     border: 1px solid var(--os-border-subtle);
     border-radius: 999px;
-    background: var(--os-hint-bg);
+    background: color-mix(in srgb, var(--os-surface-raised) 72%, transparent);
+    color: var(--os-muted);
+    font-size: var(--font-xs);
+    font-weight: 560;
+    cursor: pointer;
+    backdrop-filter: var(--os-blur);
+    -webkit-backdrop-filter: var(--os-blur);
+    transition:
+      background var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
+  }
+
+  .mobile-header__theme:hover {
+    background: var(--os-theme-toggle-hover);
+    color: var(--os-text);
+    transform: translateY(-1px);
+  }
+
+  .mobile-header__theme svg {
+    width: 15px;
+    height: 15px;
   }
 
   .page-content {
@@ -387,7 +411,7 @@
 .bottom-nav__container {
   padding: 6px;
   border-radius: 20px;
-  background: color-mix(in srgb, var(--os-surface-solid) 64%, transparent);
+  background: color-mix(in srgb, var(--dock-bg) 88%, transparent);
   backdrop-filter: var(--os-blur);
   -webkit-backdrop-filter: var(--os-blur);
   border: 1px solid var(--os-border);
@@ -397,6 +421,7 @@
   gap: 3px;
 }
 
+:root[data-theme="dark"] .bottom-nav__container,
 .theme-dark .bottom-nav__container {
   background: rgba(18, 18, 20, 0.66);
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.38);
