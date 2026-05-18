@@ -45,7 +45,13 @@ function App() {
   }, [theme]);
 
   function toggleTheme() {
-    setTheme((currentTheme) => getNextTheme(currentTheme));
+    const nextTheme = getNextTheme(theme);
+
+    if (nextTheme === "system") {
+      setSystemTheme(getSystemTheme());
+    }
+
+    setTheme(nextTheme);
   }
 
   function login() {
@@ -64,7 +70,7 @@ function App() {
     setCurrentPage("dashboard");
   }
 
-  const shellClass = `liangos-app min-h-[100dvh] overflow-x-hidden antialiased selection:bg-sky-500/20 ${
+  const shellClass = `liangos-app min-h-[100svh] min-h-[100dvh] overflow-x-hidden antialiased selection:bg-sky-500/20 ${
     resolvedTheme === "dark" ? "theme-dark" : "theme-light"
   }`;
 

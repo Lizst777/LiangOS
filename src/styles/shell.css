@@ -1,4 +1,6 @@
 .app-shell {
+  min-height: 100%;
+  min-height: 100svh;
   min-height: 100dvh;
   display: flex;
   background: transparent;
@@ -243,8 +245,10 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  padding: var(--space-8) var(--space-10) var(--space-10);
-  max-width: 1200px;
+  padding: var(--space-8) min(max(1rem, 4vw), 3rem)
+    calc(6.75rem + env(safe-area-inset-bottom));
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
 .mobile-header {
@@ -266,9 +270,13 @@
 }
 
 .page-content {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
+  min-width: 0;
 }
 
 .page-header__desc {
@@ -291,6 +299,7 @@
 @media (max-width: 1023px) {
   .app-shell {
     flex-direction: column;
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   .sidebar {
@@ -304,8 +313,10 @@
   .main {
     width: 100%;
     max-width: 100%;
-    padding: 0 var(--space-4) 7rem;
+    padding: 0 var(--space-4) calc(7.5rem + env(safe-area-inset-bottom));
     margin: 0;
+    min-height: 100svh;
+    min-height: 100dvh;
   }
 
   .page-header {
@@ -320,27 +331,37 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
-    margin: 0 calc(-1 * var(--space-4)) var(--space-4);
-    padding: max(env(safe-area-inset-top), var(--space-3)) var(--space-4)
-      var(--space-3);
+    margin: 0 calc(-1 * var(--space-4)) var(--space-3);
+    padding: calc(0.75rem + env(safe-area-inset-top)) var(--space-4)
+      0.65rem;
     border-bottom: 1px solid var(--os-border-subtle);
-    background: color-mix(in srgb, var(--os-surface-solid) 58%, transparent);
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--os-surface-solid) 64%, transparent),
+        color-mix(in srgb, var(--os-surface-solid) 46%, transparent)
+      );
     backdrop-filter: var(--os-blur);
     -webkit-backdrop-filter: var(--os-blur);
     box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04);
+  }
+
+  .mobile-header__copy {
+    min-width: 0;
   }
 
   .mobile-header__brand {
     color: var(--os-muted);
     font-size: var(--font-xs);
     font-weight: 560;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
 
   .mobile-header__title {
-    margin-top: 2px;
+    margin-top: 1px;
     color: var(--os-text);
-    font-size: var(--font-lg);
+    font-size: 1rem;
     font-weight: 650;
     letter-spacing: -0.02em;
     line-height: 1.2;
@@ -351,13 +372,13 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    min-height: 30px;
-    padding: var(--space-1) var(--space-2);
-    border: 1px solid var(--os-border-subtle);
+    min-height: 28px;
+    padding: 4px 8px;
+    border: 1px solid var(--os-border);
     border-radius: 999px;
-    background: color-mix(in srgb, var(--os-surface-raised) 72%, transparent);
+    background: color-mix(in srgb, var(--os-surface-raised) 66%, transparent);
     color: var(--os-muted);
-    font-size: var(--font-xs);
+    font-size: 11px;
     font-weight: 560;
     cursor: pointer;
     backdrop-filter: var(--os-blur);
@@ -402,20 +423,20 @@
 .bottom-nav {
   display: none;
   position: fixed;
-  bottom: max(env(safe-area-inset-bottom), var(--space-3));
+  bottom: calc(0.75rem + env(safe-area-inset-bottom));
   left: var(--space-4);
   right: var(--space-4);
   z-index: 80;
 }
 
 .bottom-nav__container {
-  padding: 6px;
-  border-radius: 20px;
-  background: color-mix(in srgb, var(--dock-bg) 88%, transparent);
+  padding: 5px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--dock-bg) 84%, transparent);
   backdrop-filter: var(--os-blur);
   -webkit-backdrop-filter: var(--os-blur);
   border: 1px solid var(--os-border);
-  box-shadow: 0 14px 42px rgba(15, 23, 42, 0.14);
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.12);
   display: flex;
   justify-content: space-around;
   gap: 3px;
@@ -433,9 +454,9 @@
   align-items: center;
   gap: 3px;
   flex: 1;
-  padding: 6px 4px;
-  border: none;
-  border-radius: 15px;
+  padding: 5px 3px;
+  border: 1px solid transparent;
+  border-radius: 14px;
   background: transparent;
   color: var(--os-muted);
   cursor: pointer;
@@ -454,9 +475,10 @@
 }
 
 .bottom-nav__item--active {
-  background: var(--os-nav-active-bg);
+  background: color-mix(in srgb, var(--os-nav-active-bg) 84%, transparent);
+  border-color: var(--os-border-subtle);
   color: var(--os-nav-active-color);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
 .bottom-nav__item--active:hover {
@@ -467,8 +489,8 @@
 
 .bottom-nav__icon {
   flex-shrink: 0;
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
   display: flex;
   align-items: center;
   justify-content: center;

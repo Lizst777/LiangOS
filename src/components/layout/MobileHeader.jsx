@@ -14,7 +14,7 @@ function MobileHeader({ page, theme, onThemeToggle }) {
 
   return (
     <header className="mobile-header">
-      <div>
+      <div className="mobile-header__copy">
         <span className="mobile-header__brand">LiangOS</span>
         <h1 className="mobile-header__title">{meta.title}</h1>
       </div>

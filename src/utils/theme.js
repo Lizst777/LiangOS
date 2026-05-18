@@ -52,5 +52,5 @@ export function getNextTheme(theme) {
 export function getThemeLabel(theme) {
   if (theme === "light") return "浅色";
   if (theme === "dark") return "深色";
-  return "跟随系统";
+  return "跟随";
 }

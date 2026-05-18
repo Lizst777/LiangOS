@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Button from "../../ui/Button";
 import Card from "../../ui/Card";
+import InfoRow from "../../ui/InfoRow";
 import Input from "../../ui/Input";
 
 const NOTE_PASSWORD = "1191961314qweLHT";
@@ -21,6 +22,14 @@ function NotesView() {
     }
     return DEFAULT_NOTE_CONTENT;
   });
+
+  const noteStats = useMemo(() => {
+    const raw = noteContent || "";
+    return {
+      lines: raw.split("\n").filter((line) => line.trim().length > 0).length,
+      chars: raw.length,
+    };
+  }, [noteContent]);
 
   useEffect(() => {
     if (noteContent !== "") {
@@ -50,7 +59,7 @@ function NotesView() {
 
   return (
     <section className="bento">
-      <section className="bento__span-12">
+      <section className="bento__span-8">
         <Card
           title="私人备忘录"
           subtitle={isNoteUnlocked ? "已解锁 · 自动保存到本地" : "需要密码访问"}
@@ -85,6 +94,22 @@ function NotesView() {
               </section>
             </>
           )}
+        </Card>
+      </section>
+
+      <section className="bento__span-4">
+        <Card title="备忘概览" subtitle="本地笔记">
+          <InfoRow
+            label="访问状态"
+            value={isNoteUnlocked ? "已解锁" : "锁定中"}
+          />
+          <InfoRow label="字数" value={`${noteStats.chars} 个`} />
+          <InfoRow label="行数" value={`${noteStats.lines} 行`} />
+          <p className="ui-note-summary">
+            {isNoteUnlocked
+              ? "当前内容已自动保存到本地，关闭后下次继续编辑。"
+              : "解锁后即可编辑私人备忘内容。"}
+          </p>
         </Card>
       </section>
     </section>
