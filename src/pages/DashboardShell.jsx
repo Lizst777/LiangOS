@@ -8,16 +8,13 @@ import NotesView from "./views/NotesView";
 import SearchView from "./views/SearchView";
 import ToolsView from "./views/ToolsView";
 import Music from "./Music";
-import StatusView from "./views/StatusView";
 
 function DashboardShell({
-  username,
   currentPage,
   theme,
   resolvedTheme,
   onThemeToggle,
   onPageChange,
-  onLogout,
 }) {
   function renderView() {
     switch (currentPage) {
@@ -29,8 +26,6 @@ function DashboardShell({
         return <Music />;
       case "notes":
         return <NotesView />;
-      case "status":
-        return <StatusView />;
       default:
         return <DashboardView theme={theme} />;
     }
@@ -44,11 +39,10 @@ function DashboardShell({
         resolvedTheme={resolvedTheme}
         onPageChange={onPageChange}
         onThemeToggle={onThemeToggle}
-        onLogout={onLogout}
       />
       <main className="main">
         <MobileHeader page={currentPage} theme={theme} onThemeToggle={onThemeToggle} />
-        <PageHeader page={currentPage} username={username} />
+        <PageHeader page={currentPage} />
         <PageTransition pageKey={currentPage}>{renderView()}</PageTransition>
       </main>
       <BottomNavigation page={currentPage} onPageChange={onPageChange} />

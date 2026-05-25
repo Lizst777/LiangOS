@@ -1,14 +1,20 @@
 import { getPageMeta } from "../../constants/navigation";
 
-function PageHeader({ page, username }) {
+function PageHeader({ page }) {
   const meta = getPageMeta(page);
 
+  // 首页不显示 PageHeader
+  if (page === "dashboard") {
+    return null;
+  }
+
   return (
-    <header className="page-header">
-      <span className="ui-tag">Personal Digital System</span>
-      <h1>{meta.title}</h1>
+    <header className="page-header" aria-label="当前视角">
+      <span className="page-header__kicker">Current View</span>
+      <div className="page-header__line">
+        <h1>{meta.title}</h1>
+      </div>
       <p className="page-header__desc">{meta.description}</p>
-      <p className="page-header__meta">欢迎回来，{username}</p>
     </header>
   );
 }

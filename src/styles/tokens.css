@@ -1,28 +1,28 @@
 /* Design tokens - Apple / Linear / Notion */
 :root {
-  --app-bg: #eef3f8;
-  --panel-bg: rgba(255, 255, 255, 0.56);
-  --panel-bg-raised: rgba(255, 255, 255, 0.68);
-  --panel-bg-solid: rgba(255, 255, 255, 0.82);
-  --panel-border: rgba(255, 255, 255, 0.46);
-  --panel-border-soft: rgba(255, 255, 255, 0.3);
-  --text-main: #182033;
-  --text-muted: #6b788d;
-  --text-soft: #536174;
-  --dock-bg: rgba(255, 255, 255, 0.64);
+  --app-bg: #ffffff;
+  --panel-bg: #ffffff;
+  --panel-bg-raised: #ffffff;
+  --panel-bg-solid: #ffffff;
+  --panel-border: rgba(0, 0, 0, 0.07);
+  --panel-border-soft: rgba(0, 0, 0, 0.04);
+  --text-main: #14161a;
+  --text-muted: #5a6270;
+  --text-soft: #5a6270;
+  --dock-bg: #ffffff;
 }
 
 :root[data-theme="dark"] {
-  --app-bg: #09090b;
-  --panel-bg: rgba(255, 255, 255, 0.06);
-  --panel-bg-raised: rgba(255, 255, 255, 0.08);
-  --panel-bg-solid: rgba(24, 24, 27, 0.74);
-  --panel-border: rgba(255, 255, 255, 0.14);
-  --panel-border-soft: rgba(255, 255, 255, 0.08);
-  --text-main: #f4f6fb;
-  --text-muted: #a1a1aa;
-  --text-soft: #a1a1aa;
-  --dock-bg: rgba(18, 18, 20, 0.66);
+  --app-bg: #0b0b0e;
+  --panel-bg: #18181c;
+  --panel-bg-raised: #1e1e22;
+  --panel-bg-solid: #141417;
+  --panel-border: rgba(255, 255, 255, 0.10);
+  --panel-border-soft: rgba(255, 255, 255, 0.06);
+  --text-main: #f0f2f5;
+  --text-muted: #9ca3af;
+  --text-soft: #9ca3af;
+  --dock-bg: #18181c;
 }
 
 .liangos-app {
@@ -54,59 +54,51 @@
   --duration-normal: 0.25s;
   --duration-slow: 0.35s;
 
-  --sidebar-width: 248px;
-  --sidebar-collapsed: 72px;
+  --sidebar-width: 200px;
+  --sidebar-collapsed: 60px;
 
-  --os-body: var(--app-bg);
+    --os-body: var(--app-bg);
   --os-text: var(--text-main);
-  --os-text-secondary: #334155;
+  --os-text-secondary: #3f4557;
   --os-muted: var(--text-muted);
   --os-muted-paragraph: var(--text-soft);
   --os-border: var(--panel-border);
   --os-border-subtle: var(--panel-border-soft);
-  --os-border-input: rgba(15, 23, 42, 0.12);
+  --os-border-input: rgba(0, 0, 0, 0.10);
   --os-surface: var(--panel-bg);
   --os-surface-raised: var(--panel-bg-raised);
   --os-surface-solid: var(--panel-bg-solid);
-  --os-shadow-xs: 0 1px 2px rgba(30, 41, 59, 0.04);
-  --os-shadow-sm: 0 8px 20px rgba(30, 41, 59, 0.06);
-  --os-shadow-md: 0 18px 48px rgba(30, 41, 59, 0.09);
-  --os-shadow-lg: 0 28px 80px rgba(30, 41, 59, 0.12);
-  --os-blur: blur(28px);
-  --os-login-grad-1: rgba(191, 219, 254, 0.35);
-  --os-login-grad-2: rgba(221, 214, 254, 0.3);
-  --os-dash-bg: #eef3f8;
-  --os-sidebar-bg: rgba(255, 255, 255, 0.48);
-  --os-sidebar-divider: rgba(255, 255, 255, 0.36);
-  --os-nav-hover: rgba(255, 255, 255, 0.5);
-  --os-nav-active-bg: rgba(24, 32, 51, 0.82);
-  --os-nav-active-color: #ffffff;
-  --os-nav-active-shadow: 0 1px 2px rgba(15, 23, 42, 0.08),
-    0 10px 24px rgba(15, 23, 42, 0.12);
-  --os-nav-indicator: #ffffff;
-  --os-logout-bg: rgba(15, 23, 42, 0.04);
-  --os-logout-color: #0f172a;
-  --os-hint-bg: rgba(15, 23, 42, 0.03);
-  --os-info-border: rgba(15, 23, 42, 0.06);
-  --os-info-muted: #64748b;
-  --os-info-strong: #0f172a;
+  --os-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --os-shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.05);
+  --os-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --os-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.10);
+  --os-blur: blur(0px);
+    --os-dash-bg: var(--app-bg);
+  --os-sidebar-bg: #ecedf1;
+  --os-sidebar-divider: rgba(0, 0, 0, 0.08);
+  --os-nav-hover: rgba(0, 0, 0, 0.04);
+  --os-nav-active-bg: transparent;
+  --os-nav-active-color: var(--os-text);
+  --os-nav-active-shadow: none;
+  --os-nav-indicator: var(--os-accent);
+  --os-hint-bg: rgba(0, 0, 0, 0.04);
+  --os-info-border: rgba(0, 0, 0, 0.06);
+  --os-info-muted: var(--text-muted);
+  --os-info-strong: var(--os-text);
   --os-accent: #3b82f6;
   --os-accent-line: #93c5fd;
   --os-accent-muted: rgba(59, 130, 246, 0.12);
-  --os-btn-primary: #0f172a;
+  --os-btn-primary: #1a1d26;
   --os-btn-primary-fg: #ffffff;
-  --os-btn-primary-hover: 0 8px 24px rgba(15, 23, 42, 0.18);
-  --os-focus-ring: rgba(15, 23, 42, 0.08);
-  --os-theme-toggle-bg: rgba(15, 23, 42, 0.04);
-  --os-theme-toggle-border: rgba(15, 23, 42, 0.08);
-  --os-theme-toggle-hover: rgba(15, 23, 42, 0.07);
+  --os-btn-primary-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --os-focus-ring: rgba(59, 130, 246, 0.15);
+  --os-theme-toggle-bg: rgba(0, 0, 0, 0.05);
+  --os-theme-toggle-border: rgba(0, 0, 0, 0.08);
+  --os-theme-toggle-hover: rgba(0, 0, 0, 0.08);
   --os-stat-positive: #16a34a;
 
   min-height: 100dvh;
-  background:
-    radial-gradient(circle at 12% 10%, rgba(191, 219, 254, 0.48), transparent 34%),
-    radial-gradient(circle at 88% 18%, rgba(226, 232, 240, 0.68), transparent 32%),
-    linear-gradient(145deg, #f8fafc 0%, #edf3f9 46%, #e8eef6 100%);
+  background: var(--app-bg);
   color: var(--os-text);
   color-scheme: light;
   font-size: var(--font-base);
@@ -116,54 +108,46 @@
 
 :root[data-theme="dark"] .liangos-app,
 .liangos-app.theme-dark {
-  --os-body: #09090b;
-  --os-text: #f4f6fb;
-  --os-text-secondary: #d4d4d8;
-  --os-muted: #a1a1aa;
-  --os-muted-paragraph: #a1a1aa;
-  --os-border: rgba(255, 255, 255, 0.14);
-  --os-border-subtle: rgba(255, 255, 255, 0.08);
-  --os-border-input: rgba(255, 255, 255, 0.1);
-  --os-surface: rgba(255, 255, 255, 0.06);
-  --os-surface-raised: rgba(255, 255, 255, 0.08);
-  --os-surface-solid: rgba(24, 24, 27, 0.74);
+  --os-body: var(--app-bg);
+  --os-text: var(--text-main);
+  --os-text-secondary: #d0d3d9;
+  --os-muted: var(--text-muted);
+  --os-muted-paragraph: var(--text-soft);
+  --os-border: var(--panel-border);
+  --os-border-subtle: var(--panel-border-soft);
+  --os-border-input: rgba(255, 255, 255, 0.08);
+  --os-surface: var(--panel-bg);
+  --os-surface-raised: var(--panel-bg-raised);
+  --os-surface-solid: var(--panel-bg-solid);
   --os-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --os-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
-  --os-shadow-md: 0 8px 28px rgba(0, 0, 0, 0.35);
-  --os-shadow-lg: 0 24px 56px rgba(0, 0, 0, 0.45);
-  --os-blur: blur(30px);
-  --os-login-grad-1: rgba(59, 130, 246, 0.12);
-  --os-login-grad-2: rgba(124, 58, 237, 0.1);
-  --os-dash-bg: #09090b;
-  --os-sidebar-bg: rgba(18, 18, 20, 0.58);
-  --os-sidebar-divider: rgba(255, 255, 255, 0.1);
-  --os-nav-hover: rgba(255, 255, 255, 0.07);
-  --os-nav-active-bg: rgba(255, 255, 255, 0.13);
-  --os-nav-active-color: #fafafa;
-  --os-nav-active-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 4px 16px rgba(0, 0, 0, 0.35);
+  --os-shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.25);
+  --os-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --os-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --os-blur: blur(0px);
+  --os-dash-bg: var(--app-bg);
+  --os-sidebar-bg: #141418;
+  --os-sidebar-divider: rgba(255, 255, 255, 0.06);
+  --os-nav-hover: rgba(255, 255, 255, 0.08);
+  --os-nav-active-bg: rgba(255, 255, 255, 0.14);
+  --os-nav-active-color: var(--os-text);
+  --os-nav-active-shadow: none;
   --os-nav-indicator: var(--os-accent);
-  --os-logout-bg: rgba(255, 255, 255, 0.06);
-  --os-logout-color: #fafafa;
   --os-hint-bg: rgba(255, 255, 255, 0.04);
   --os-info-border: rgba(255, 255, 255, 0.06);
-  --os-info-muted: #a1a1aa;
-  --os-info-strong: #fafafa;
+  --os-info-muted: var(--text-muted);
+  --os-info-strong: var(--os-text);
   --os-accent: #60a5fa;
   --os-accent-line: rgba(96, 165, 250, 0.5);
   --os-accent-muted: rgba(96, 165, 250, 0.15);
   --os-btn-primary: #e4e4e7;
   --os-btn-primary-fg: #18181b;
-  --os-btn-primary-hover: 0 8px 28px rgba(0, 0, 0, 0.4);
+  --os-btn-primary-hover: 0 4px 12px rgba(0, 0, 0, 0.4);
   --os-focus-ring: rgba(96, 165, 250, 0.2);
   --os-theme-toggle-bg: rgba(255, 255, 255, 0.05);
   --os-theme-toggle-border: rgba(255, 255, 255, 0.08);
-  --os-theme-toggle-hover: rgba(255, 255, 255, 0.09);
+  --os-theme-toggle-hover: rgba(255, 255, 255, 0.08);
   --os-stat-positive: #4ade80;
 
   color-scheme: dark;
-  background:
-    radial-gradient(circle at 16% 8%, rgba(59, 130, 246, 0.18), transparent 32%),
-    radial-gradient(circle at 84% 12%, rgba(148, 163, 184, 0.08), transparent 30%),
-    linear-gradient(145deg, #08090d 0%, #0d1119 52%, #09090b 100%);
+  background: var(--app-bg);
 }

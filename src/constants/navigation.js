@@ -1,36 +1,31 @@
 export const NAV_ITEMS = [
-  { id: "dashboard", label: "总览", icon: "grid" },
-  { id: "search", label: "搜索中心", icon: "search" },
-  { id: "tools", label: "工具发现", icon: "compass" },
-  { id: "music", label: "音乐空间", icon: "music" },
-  { id: "notes", label: "私人备忘录", icon: "note" },
-  { id: "status", label: "系统状态", icon: "activity" },
+  { id: "dashboard", label: "Overview", icon: "grid" },
+  { id: "search", label: "Search", icon: "search" },
+  { id: "tools", label: "Tools", icon: "compass" },
+  { id: "music", label: "Music", icon: "music" },
+  { id: "notes", label: "Notes", icon: "note" },
 ];
 
 export const PAGE_META = {
   dashboard: {
-    title: "总览",
-    description: "实时时间与天气信息",
+    title: "Overview",
+    description: "",
   },
   search: {
-    title: "搜索中心",
-    description: "搜索 LiangOS 内部资源，或使用 Google 搜索全网",
+    title: "Search",
+    description: "",
   },
   tools: {
-    title: "工具发现",
-    description: "探索 AI 与效率工具，收藏你常用的产品",
+    title: "Tools",
+    description: "",
   },
   music: {
-    title: "音乐空间",
-    description: "网易云音乐歌单 · 跳转客户端或网页收听",
+    title: "Music",
+    description: "",
   },
   notes: {
-    title: "私人备忘录",
-    description: "加密存储的个人笔记",
-  },
-  status: {
-    title: "系统状态",
-    description: "运行环境与模块状态",
+    title: "Notes",
+    description: "",
   },
 };
 
