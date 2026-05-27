@@ -13,7 +13,7 @@ function MobileHeader({ page, theme, onThemeToggle }) {
   const themeLabel = getThemeLabel(theme);
 
   return (
-    <header className="mobile-header">
+    <header className={`mobile-header mobile-header--${page}`}>
       <div className="mobile-header__copy">
         <span className="mobile-header__brand">LiangOS</span>
         <h1 className="mobile-header__title">{meta.title}</h1>
@@ -22,8 +22,8 @@ function MobileHeader({ page, theme, onThemeToggle }) {
         type="button"
         className="mobile-header__theme theme-cycle"
         onClick={onThemeToggle}
-        aria-label={`当前主题：${themeLabel}，点击切换`}
-        title={`主题：${themeLabel}`}
+        aria-label={`Current theme: ${themeLabel}. Switch theme.`}
+        title={`Theme: ${themeLabel}`}
       >
         <ThemeIcon theme={theme} />
         <span>{themeLabel}</span>
