@@ -1,8 +1,5 @@
 export const NAV_ITEMS = [
   { id: "dashboard", label: "Overview", icon: "grid" },
-  { id: "search", label: "Search", icon: "search" },
-  { id: "tools", label: "Tools", icon: "compass" },
-  { id: "music", label: "Music", icon: "music" },
   { id: "notes", label: "Notes", icon: "note" },
 ];
 
@@ -13,10 +10,6 @@ export const PAGE_META = {
   },
   search: {
     title: "Search",
-    description: "",
-  },
-  tools: {
-    title: "Tools",
     description: "",
   },
   music: {

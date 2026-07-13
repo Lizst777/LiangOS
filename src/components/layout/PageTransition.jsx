@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 function PageTransition({ pageKey, children }) {
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="wait" initial={false}>
       <motion.div
         key={pageKey}
         className={`page-content page-content--${pageKey}`}

@@ -6,7 +6,6 @@ import MobileHeader from "../components/layout/MobileHeader";
 import DashboardView from "./views/DashboardView";
 import NotesView from "./views/NotesView";
 import SearchView from "./views/SearchView";
-import ToolsView from "./views/ToolsView";
 import Music from "./Music";
 
 function DashboardShell({
@@ -20,8 +19,6 @@ function DashboardShell({
     switch (currentPage) {
       case "search":
         return <SearchView />;
-      case "tools":
-        return <ToolsView />;
       case "music":
         return <Music />;
       case "notes":

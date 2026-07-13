@@ -4,7 +4,6 @@ import { IconMoon, IconSun, IconMonitor } from "../../ui/Icons";
 const EDITORIAL_LABELS = {
   dashboard: "Overview",
   search: "Search",
-  tools: "Tools",
   music: "Music",
   notes: "Notes",
 };

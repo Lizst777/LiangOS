@@ -1,10 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { fadeInUp } from "../utils/gsapMotion";
+import { useEffect, useState } from "react";
 import { fetchQWeather, getQWeatherLocationName } from "../utils/qweather";
-
-gsap.registerPlugin(useGSAP);
 
 const WEATHER_TEXT = {
   晴: "Sunny",
@@ -62,7 +57,6 @@ function normalizeLocationName(value) {
 
 function WeatherStatus() {
   const [weather, setWeather] = useState(null);
-  const rootRef = useRef(null);
 
   useEffect(() => {
     async function load() {
@@ -97,18 +91,10 @@ function WeatherStatus() {
     load();
   }, []);
 
-  useGSAP(
-    () => {
-      if (!weather) return;
-      fadeInUp(".weather-status__inner", { y: 6 });
-    },
-    { dependencies: [weather], scope: rootRef },
-  );
-
   if (!weather) return null;
 
   return (
-    <div className="weather-status" aria-label="Weather" ref={rootRef}>
+    <div className="weather-status" aria-label="Weather">
       <div className="weather-status__inner">
         <span className="weather-status__icon" aria-hidden>
           {WEATHER_ICON[weather.text] || "☁"}

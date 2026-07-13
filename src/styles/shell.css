@@ -285,7 +285,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: rgba(0, 0, 0, 0.32);
+  background: rgba(0, 0, 0, 0.34);
 }
 
 .page-content--dashboard .time-display__hours,
@@ -301,12 +301,14 @@
 
 .page-content--dashboard .weather-status,
 .page-content--dashboard .weather-status__copy strong {
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.42);
 }
 
 .page-content--dashboard .weather-status__icon,
 .page-content--dashboard .weather-status__copy span {
-  color: rgba(255, 255, 255, 0.68);
+  color: rgba(255, 255, 255, 0.78);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.42);
 }
 
 .app-shell:has(.page-content--dashboard) .sidebar__item {
@@ -353,15 +355,20 @@
 .time-display {
   position: relative;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(0.55rem, 1.2vw, 1rem);
-  transform: translateY(-0.75vh);
+  display: grid;
+  grid-template-areas:
+    "clock"
+    "date"
+    "moment";
+  grid-template-rows: auto auto minmax(clamp(7rem, 13vh, 10rem), auto);
+  justify-items: center;
+  align-content: center;
+  row-gap: clamp(0.65rem, 1.25vh, 1rem);
+  width: 100%;
 }
 
 .time-display__clock {
+  grid-area: clock;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -394,6 +401,7 @@
 }
 
 .time-display__date {
+  grid-area: date;
   font-size: clamp(1rem, 1.65vw, 1.45rem);
   font-weight: 440;
   color: var(--os-text);
@@ -451,6 +459,100 @@
   font-weight: 430;
   letter-spacing: -0.01em;
   line-height: 1.35;
+}
+
+.moment {
+  grid-area: moment;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: min(86vw, 48rem);
+  min-height: clamp(7rem, 13vh, 10rem);
+  margin-top: clamp(1.1rem, 2.4vh, 2.2rem);
+  color: rgba(255, 255, 255, 0.86);
+  font-size: clamp(2rem, 3.35vw, 2.75rem);
+  font-weight: 410;
+  letter-spacing: 0;
+  line-height: 1.28;
+  text-align: center;
+  transform: translateY(0);
+}
+
+.moment-quote,
+.moment-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  cursor: pointer;
+  transition:
+    color 180ms var(--ease-out),
+    opacity 180ms var(--ease-out),
+    transform 180ms var(--ease-out);
+}
+
+.moment-quote {
+  max-width: 100%;
+  opacity: 0.94;
+  text-align: center;
+  white-space: normal;
+}
+
+.moment-meta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42rem;
+  margin-top: clamp(0.72rem, 1.25vh, 1rem);
+  color: rgba(255, 255, 255, 0.48);
+  font-size: clamp(0.875rem, 1.1vw, 1.125rem);
+  font-weight: 390;
+  line-height: 1.4;
+}
+
+.moment-author,
+.moment-save {
+  color: inherit;
+  font-size: inherit;
+}
+
+.moment-divider {
+  opacity: 0.68;
+}
+
+.moment-save {
+  min-width: 3.6em;
+  opacity: 0.62;
+  text-align: left;
+}
+
+.moment-save:disabled {
+  cursor: wait;
+}
+
+.moment-quote:hover,
+.moment-save:hover {
+  color: rgba(255, 255, 255, 0.86);
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.moment:hover .moment-save,
+.moment:focus-within .moment-save {
+  opacity: 0.82;
+}
+
+.moment-save:focus-visible {
+  opacity: 1;
+  outline: none;
 }
 
 /* ===== Editorial shared language ===== */
@@ -877,7 +979,7 @@
   .weather-status__icon {
     min-width: 0;
     font-size: 0.92rem;
-    opacity: 0.72;
+    opacity: 0.86;
   }
 
   .weather-status__copy {
@@ -899,7 +1001,7 @@
 
   .weather-status__copy span {
     font-size: 0.72rem;
-    opacity: 0.78;
+    opacity: 0.9;
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -911,21 +1013,39 @@
   }
 
   .time-display {
-    transform: translateY(-1vh);
+    row-gap: clamp(0.5rem, 1.2vh, 0.75rem);
+    width: 100%;
   }
 
   .time-display__clock {
     gap: clamp(0.12rem, 1vw, 0.32rem);
+    max-width: 92vw;
   }
 
   .time-display__hours,
   .time-display__minutes,
   .time-display__colon {
-    font-size: clamp(4.8rem, 24vw, 7.2rem);
+    font-size: clamp(4.5rem, 20vw, 6.25rem);
   }
 
   .time-display__date {
     font-size: clamp(0.86rem, 4vw, 1.05rem);
+  }
+
+  .moment {
+    width: min(88vw, 28rem);
+    min-height: clamp(6.25rem, 14vh, 8rem);
+    margin-top: clamp(0.85rem, 2.2vh, 1.5rem);
+    font-size: clamp(1.25rem, 6vw, 1.75rem);
+  }
+
+  .moment-meta {
+    margin-top: 0.65rem;
+    font-size: clamp(0.875rem, 3.6vw, 1rem);
+  }
+
+  .moment-save {
+    font-size: inherit;
   }
 
   .notes-gate,
@@ -1083,5 +1203,43 @@
 @media (min-width: 1024px) {
   .bottom-nav {
     display: none !important;
+  }
+}
+
+@media (min-width: 1024px) and (max-height: 800px) {
+  .time-display {
+    grid-template-rows: auto auto minmax(6.25rem, auto);
+    row-gap: 0.55rem;
+  }
+
+  .time-display__hours,
+  .time-display__minutes,
+  .time-display__colon {
+    font-size: clamp(6rem, 13vw, 10.5rem);
+  }
+
+  .moment {
+    min-height: 6.25rem;
+    margin-top: 0.7rem;
+    font-size: clamp(1.75rem, 2.8vw, 2.35rem);
+  }
+}
+
+@media (max-width: 1023px) and (max-height: 760px) {
+  .time-display {
+    grid-template-rows: auto auto minmax(5.25rem, auto);
+    row-gap: 0.42rem;
+  }
+
+  .time-display__hours,
+  .time-display__minutes,
+  .time-display__colon {
+    font-size: clamp(4rem, 18vw, 5.4rem);
+  }
+
+  .moment {
+    min-height: 5.25rem;
+    margin-top: 0.55rem;
+    font-size: clamp(1.25rem, 5.4vw, 1.55rem);
   }
 }
