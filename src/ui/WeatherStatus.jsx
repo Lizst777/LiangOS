@@ -55,10 +55,18 @@ function normalizeLocationName(value) {
   return value;
 }
 
-function WeatherStatus() {
+function WeatherStatus({ onWeatherChange }) {
   const [weather, setWeather] = useState(null);
 
   useEffect(() => {
+    let active = true;
+
+    function commitWeather(nextWeather) {
+      if (!active) return;
+      setWeather(nextWeather);
+      onWeatherChange?.(nextWeather);
+    }
+
     async function load() {
       try {
         const position = await new Promise((resolve, reject) => {
@@ -69,7 +77,7 @@ function WeatherStatus() {
         const data = await fetchQWeather(longitude, latitude);
         const name = await getQWeatherLocationName(longitude, latitude);
 
-        setWeather({
+        commitWeather({
           temperature: data.temperature,
           text: normalizeWeatherText(data.weatherText),
           location: normalizeLocationName(name),
@@ -77,19 +85,23 @@ function WeatherStatus() {
       } catch {
         try {
           const data = await fetchQWeather(119.46, 35.42);
-          setWeather({
+          commitWeather({
             temperature: data.temperature,
             text: normalizeWeatherText(data.weatherText),
             location: "Rizhao, Shandong",
           });
         } catch {
-          setWeather(null);
+          commitWeather(null);
         }
       }
     }
 
     load();
-  }, []);
+
+    return () => {
+      active = false;
+    };
+  }, [onWeatherChange]);
 
   if (!weather) return null;
 

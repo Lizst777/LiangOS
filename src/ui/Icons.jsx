@@ -100,6 +100,14 @@ export function IconMonitor() {
   );
 }
 
+export function IconClose() {
+  return (
+    <svg {...iconProps}>
+      <path d="M18 6 6 18M6 6l12 12" />
+    </svg>
+  );
+}
+
 export function IconChevron({ direction = "left" }) {
   const rotate = direction === "right" ? 180 : 0;
   return (

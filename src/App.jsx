@@ -8,8 +8,16 @@ import {
   setStoredTheme,
 } from "./utils/theme";
 
+const PAGE_BY_HASH = {
+  "#notes": "notes",
+};
+
+function getPageFromLocation() {
+  return PAGE_BY_HASH[window.location.hash.toLowerCase()] ?? "dashboard";
+}
+
 function App() {
-  const [currentPage, setCurrentPage] = useState("dashboard");
+  const [currentPage, setCurrentPage] = useState(getPageFromLocation);
   const [theme, setTheme] = useState(() => {
     const storedTheme = getStoredTheme();
     applyTheme(storedTheme);
@@ -39,6 +47,15 @@ function App() {
     };
   }, [theme]);
 
+  useEffect(() => {
+    function syncPageFromHistory() {
+      setCurrentPage(getPageFromLocation());
+    }
+
+    window.addEventListener("popstate", syncPageFromHistory);
+    return () => window.removeEventListener("popstate", syncPageFromHistory);
+  }, []);
+
   function toggleTheme() {
     const nextTheme = getNextTheme(theme);
 
@@ -47,6 +64,18 @@ function App() {
     }
 
     setTheme(nextTheme);
+  }
+
+  function navigateToPage(page) {
+    const nextPage = page === "notes" ? "notes" : "dashboard";
+    const nextHash = nextPage === "notes" ? "#notes" : "";
+    const nextUrl = `${window.location.pathname}${window.location.search}${nextHash}`;
+
+    if (window.location.hash !== nextHash) {
+      window.history.pushState({}, "", nextUrl);
+    }
+
+    setCurrentPage(nextPage);
   }
 
   const shellClass = `liangos-app min-h-[100svh] min-h-[100dvh] overflow-x-hidden antialiased selection:bg-sky-500/20 ${
@@ -60,7 +89,7 @@ function App() {
         theme={theme}
         resolvedTheme={resolvedTheme}
         onThemeToggle={toggleTheme}
-        onPageChange={setCurrentPage}
+        onPageChange={navigateToPage}
       />
     </div>
   );

@@ -5,8 +5,6 @@ import BottomNavigation from "../components/layout/BottomNavigation";
 import MobileHeader from "../components/layout/MobileHeader";
 import DashboardView from "./views/DashboardView";
 import NotesView from "./views/NotesView";
-import SearchView from "./views/SearchView";
-import Music from "./Music";
 
 function DashboardShell({
   currentPage,
@@ -17,14 +15,10 @@ function DashboardShell({
 }) {
   function renderView() {
     switch (currentPage) {
-      case "search":
-        return <SearchView />;
-      case "music":
-        return <Music />;
       case "notes":
         return <NotesView />;
       default:
-        return <DashboardView theme={theme} />;
+        return <DashboardView onOpenNotes={() => onPageChange("notes")} />;
     }
   }
 

@@ -11,7 +11,7 @@ const weekdayFormatter = new Intl.DateTimeFormat("en-US", {
   weekday: "long",
 });
 
-function TimeDisplay() {
+function TimeDisplay({ weather, daypart, onOpenNotes }) {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -33,7 +33,7 @@ function TimeDisplay() {
         <span className="time-display__minutes">{minutes}</span>
       </time>
       <div className="time-display__date">{date}</div>
-      <MomentText />
+      <MomentText weather={weather} daypart={daypart} onOpenNotes={onOpenNotes} />
     </div>
   );
 }

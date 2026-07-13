@@ -46,13 +46,7 @@ function formatLocationName(location) {
 }
 
 async function fetchJsonResponse(url) {
-  let res;
-  try {
-    res = await fetch(url);
-  } catch (networkErr) {
-    console.error("QWeather fetch network error:", networkErr);
-    throw networkErr;
-  }
+  const res = await fetch(url);
 
   const text = await res.text();
   let data;
@@ -62,7 +56,7 @@ async function fetchJsonResponse(url) {
     data = text;
   }
 
-  return { res, data, url };
+  return { res, data };
 }
 
 /**
@@ -75,22 +69,14 @@ export async function fetchQWeather(longitude, latitude) {
   const url = `${QWEATHER_HOST}/v7/weather/now?location=${longitude},${latitude}&key=${QWEATHER_KEY}`;
   const { res, data } = await fetchJsonResponse(url);
 
-  // 打印完整返回，便于浏览器控制台查看
-  console.log("QWeather response:", data);
-
   if (res.status === 403) {
-    console.error("QWeather request URL:", url);
-    console.error("QWeather response.status:", res.status);
-    console.error("QWeather response body:", data);
-    console.error("提示：可能是 API Host 错误、Key 权限限制、订阅未启用或安全限制");
-    const err = new Error('403');
+    const err = new Error("QWeather request failed (403).");
     err.status = 403;
     err.body = data;
     throw err;
   }
 
   if (!res.ok || !data || data.code !== '200' || !data.now) {
-    console.error("QWeather error:", data && data.code, data);
     const err = new Error((data && data.code) || `HTTP ${res.status}`);
     err.status = res.status;
     err.body = data;
@@ -122,40 +108,26 @@ export async function getQWeatherLocationName(longitude, latitude) {
 
   for (const host of geoHosts) {
     const url = `${host}/geo/v2/city/lookup?location=${longitude},${latitude}&key=${QWEATHER_KEY}&lang=zh`;
-    console.log("QWeather Geo try:", url.replace(QWEATHER_KEY, "***"));
 
     let res;
     let data;
     try {
       ({ res, data } = await fetchJsonResponse(url));
-    } catch (fetchErr) {
-      console.error("QWeather Geo error:", {
-        status: fetchErr?.status || 'fetch-error',
-        code: fetchErr?.body?.code,
-        body: fetchErr,
-      });
+    } catch {
       continue;
     }
-
-    console.log("QWeather Geo status:", res.status);
-    console.log("QWeather Geo body:", data);
 
     if (res.status === 404) {
       continue;
     }
 
     if (res.ok && data && data.code === '200' && Array.isArray(data.location) && data.location[0]) {
-      return formatLocationName(data.location[0]) || '未知地区';
+      return formatLocationName(data.location[0]) || "Location unavailable";
     }
 
-    console.error("QWeather Geo error:", {
-      status: res.status,
-      code: data?.code,
-      body: data,
-    });
   }
 
-  return '未知地区';
+  return "Location unavailable";
 }
 
 export default fetchQWeather;

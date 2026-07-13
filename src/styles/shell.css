@@ -257,6 +257,7 @@
 
 /* ===== Workspace — calm center ===== */
 .workspace {
+  --workspace-overlay: rgba(0, 0, 0, 0.34);
   width: 100vw;
   height: 100vh;
   height: 100svh;
@@ -285,7 +286,27 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: rgba(0, 0, 0, 0.34);
+  background: var(--workspace-overlay);
+}
+
+.workspace--morning {
+  --workspace-overlay: rgba(24, 14, 4, 0.27);
+}
+
+.workspace--day {
+  --workspace-overlay: rgba(0, 0, 0, 0.34);
+}
+
+.workspace--evening {
+  --workspace-overlay: rgba(15, 8, 11, 0.4);
+}
+
+.workspace--night {
+  --workspace-overlay: rgba(2, 5, 9, 0.49);
+}
+
+.workspace--weather-soft {
+  --workspace-overlay: rgba(4, 6, 8, 0.43);
 }
 
 .page-content--dashboard .time-display__hours,
@@ -481,7 +502,7 @@
 }
 
 .moment-quote,
-.moment-save {
+.moment-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -519,7 +540,7 @@
 }
 
 .moment-author,
-.moment-save {
+.moment-action {
   color: inherit;
   font-size: inherit;
 }
@@ -528,31 +549,131 @@
   opacity: 0.68;
 }
 
-.moment-save {
-  min-width: 3.6em;
+.moment-action {
   opacity: 0.62;
-  text-align: left;
+  text-align: center;
 }
 
-.moment-save:disabled {
+.moment-action--save {
+  width: 3.4em;
+}
+
+.moment-action:disabled {
   cursor: wait;
 }
 
 .moment-quote:hover,
-.moment-save:hover {
+.moment-action:hover {
   color: rgba(255, 255, 255, 0.86);
   opacity: 1;
   transform: translateY(-1px);
 }
 
-.moment:hover .moment-save,
-.moment:focus-within .moment-save {
+.moment:hover .moment-action,
+.moment:focus-within .moment-action {
   opacity: 0.82;
 }
 
-.moment-save:focus-visible {
+.moment-action:focus-visible {
   opacity: 1;
   outline: none;
+}
+
+/* ===== Moment archive — private traces ===== */
+.moment-archive {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow-y: auto;
+  background: var(--os-body);
+  color: var(--os-text);
+  scrollbar-width: none;
+}
+
+.moment-archive::-webkit-scrollbar {
+  display: none;
+}
+
+.moment-archive__inner {
+  width: min(58rem, calc(100% - 6rem));
+  min-height: 100%;
+  margin: 0 auto;
+  padding: clamp(3rem, 8vh, 6.5rem) 0 clamp(5rem, 10vh, 8rem);
+}
+
+.moment-archive__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: clamp(4rem, 10vh, 8rem);
+}
+
+.moment-archive__header h2 {
+  margin: 0;
+  font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.moment-archive__close {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--os-muted);
+  cursor: pointer;
+  opacity: 0.58;
+  transition: color 180ms var(--ease-out), opacity 180ms var(--ease-out);
+}
+
+.moment-archive__close:hover,
+.moment-archive__close:focus-visible {
+  color: var(--os-text);
+  opacity: 1;
+  outline: none;
+}
+
+.moment-archive__list {
+  display: grid;
+}
+
+.moment-archive__empty {
+  margin: 0;
+  color: var(--os-muted);
+  font-size: 0.86rem;
+  opacity: 0.62;
+}
+
+.moment-trace {
+  display: grid;
+  grid-template-columns: minmax(10rem, 0.7fr) minmax(14rem, 1.5fr) minmax(10rem, 1fr);
+  align-items: baseline;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  padding: clamp(1.35rem, 2.5vh, 2rem) 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--os-muted) 18%, transparent);
+}
+
+.moment-trace:first-child {
+  border-top: 1px solid color-mix(in srgb, var(--os-muted) 18%, transparent);
+}
+
+.moment-trace time,
+.moment-trace span {
+  color: var(--os-muted);
+  font-size: 0.76rem;
+  line-height: 1.6;
+  opacity: 0.64;
+}
+
+.moment-trace p {
+  margin: 0;
+  color: var(--os-text);
+  font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+  font-weight: 430;
+  line-height: 1.6;
 }
 
 /* ===== Editorial shared language ===== */
@@ -816,16 +937,19 @@
 
 .notes-editor {
   position: relative;
-  place-items: stretch;
+  display: block;
+  padding-bottom: clamp(5rem, 12vh, 9rem);
 }
 
 .notes-editor__textarea {
+  display: block;
   width: min(72rem, 100%);
   min-height: calc(100svh - 16rem);
-  margin: auto;
+  margin: 0 auto;
   border: 0;
   background: transparent;
   color: var(--os-text);
+  overflow: hidden;
   resize: none;
   outline: none;
   font: inherit;
@@ -836,15 +960,17 @@
 }
 
 .notes-editor__meta {
-  position: absolute;
-  right: 0;
-  bottom: 0;
+  position: sticky;
+  right: auto;
+  bottom: 1.5rem;
   display: flex;
   align-items: center;
   gap: 0.45rem;
   color: var(--os-muted);
   font-size: 0.72rem;
   opacity: 0.66;
+  width: max-content;
+  margin: 1.5rem 0 0 auto;
 }
 
 .notes-editor__status {
@@ -1066,8 +1192,28 @@
     font-size: clamp(0.875rem, 3.6vw, 1rem);
   }
 
-  .moment-save {
+  .moment-action {
     font-size: inherit;
+  }
+
+  .moment-archive__inner {
+    width: min(100% - 2.5rem, 38rem);
+    padding-top: calc(2rem + env(safe-area-inset-top));
+  }
+
+  .moment-archive__header {
+    margin-bottom: clamp(2.5rem, 8vh, 4.5rem);
+  }
+
+  .moment-trace {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+    padding: 1.35rem 0;
+  }
+
+  .moment-trace p {
+    grid-row: 1;
+    font-size: clamp(1.05rem, 5vw, 1.3rem);
   }
 
   .notes-gate,

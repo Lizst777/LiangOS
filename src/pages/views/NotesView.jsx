@@ -1,9 +1,38 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useOwnerSession } from "../../hooks/useOwnerSession";
 import { supabase } from "../../lib/supabase";
 
 const LEGACY_STORAGE_KEY = "liangos-notes-content";
-const OWNER_EMAIL = "notes-owner@liangos.local";
 const SAVE_DELAY = 700;
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+
+const weekdayFormatter = new Intl.DateTimeFormat("en-US", {
+  weekday: "long",
+});
+
+function getLocalDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatDateAnchor(date = new Date()) {
+  return `${dateFormatter.format(date)} · ${weekdayFormatter.format(date)}`;
+}
+
+function appendDateAnchor(content, date = new Date()) {
+  const anchor = formatDateAnchor(date);
+  const trimmed = content.trimEnd();
+
+  if (trimmed.endsWith(anchor)) return content;
+  return trimmed ? `${trimmed}\n\n${anchor}\n\n` : `${anchor}\n\n`;
+}
 
 function getLegacyContent() {
   try {
@@ -17,62 +46,41 @@ function clearLegacyContent() {
   try {
     localStorage.removeItem(LEGACY_STORAGE_KEY);
   } catch {
-    // The cloud note is already saved, so a restricted browser needs no fallback.
+    // The cloud copy is authoritative after migration.
   }
 }
 
 function NotesView() {
-  const [session, setSession] = useState(null);
-  const [isAuthReady, setIsAuthReady] = useState(!supabase);
+  const { isAvailable, isReady, user, signIn, signOut } = useOwnerSession();
   const [password, setPassword] = useState("");
-  const [authStatus, setAuthStatus] = useState(supabase ? "idle" : "unavailable");
+  const [authStatus, setAuthStatus] = useState(isAvailable ? "idle" : "unavailable");
   const [content, setContent] = useState("");
+  const [entryDate, setEntryDate] = useState(null);
   const [isNoteReady, setIsNoteReady] = useState(false);
   const [saveStatus, setSaveStatus] = useState("idle");
-  const lastSavedContent = useRef("");
+  const textareaRef = useRef(null);
+  const lastSaved = useRef({ content: "", entryDate: null });
   const saveRequest = useRef(0);
-
-  const userId = session?.user?.id ?? null;
-
-  useEffect(() => {
-    if (!supabase) return undefined;
-
-    let isActive = true;
-
-    supabase.auth.getSession().then(({ data, error }) => {
-      if (!isActive) return;
-
-      setSession(data.session);
-      setAuthStatus(error ? "error" : "idle");
-      setIsAuthReady(true);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      if (!isActive) return;
-
-      setSession(nextSession);
-      setIsAuthReady(true);
-      if (nextSession) {
-        setAuthStatus("idle");
-      } else {
-        saveRequest.current += 1;
-        setContent("");
-        setIsNoteReady(false);
-        setSaveStatus("idle");
-        lastSavedContent.current = "";
-      }
-    });
-
-    return () => {
-      isActive = false;
-      subscription.unsubscribe();
-    };
-  }, []);
+  const userId = user?.id ?? null;
 
   useEffect(() => {
-    if (!supabase || !userId) return undefined;
+    const timer = window.setInterval(() => {
+      const nextDate = getLocalDateKey();
+      if (!userId || !isNoteReady || !entryDate || entryDate === nextDate) return;
+
+      setContent((current) => appendDateAnchor(current));
+      setEntryDate(nextDate);
+      setSaveStatus("saving");
+    }, 60_000);
+
+    return () => window.clearInterval(timer);
+  }, [entryDate, isNoteReady, userId]);
+
+  useEffect(() => {
+    if (!userId) {
+      saveRequest.current += 1;
+      return undefined;
+    }
 
     let isActive = true;
 
@@ -80,45 +88,58 @@ function NotesView() {
       setIsNoteReady(false);
       setSaveStatus("loading");
 
+      const currentDate = getLocalDateKey();
+      const currentDateValue = new Date();
       const { data, error } = await supabase
         .from("notes")
-        .select("content")
+        .select("content, last_entry_date")
         .eq("user_id", userId)
         .maybeSingle();
 
       if (!isActive) return;
 
       if (error) {
+        const fallbackContent = appendDateAnchor("", currentDateValue);
+        lastSaved.current = { content: "", entryDate: null };
+        setContent(fallbackContent);
+        setEntryDate(currentDate);
         setSaveStatus("error");
         setIsNoteReady(true);
         return;
       }
 
-      let nextContent = data?.content ?? "";
       const legacyContent = data ? "" : getLegacyContent();
-      let migrationFailed = false;
+      let nextContent = data?.content ?? legacyContent;
+      let nextEntryDate = data?.last_entry_date ?? null;
+      const needsDateAnchor = nextEntryDate !== currentDate;
 
-      if (legacyContent) {
-        const { error: migrationError } = await supabase.from("notes").upsert({
-          user_id: userId,
-          content: legacyContent,
-          updated_at: new Date().toISOString(),
-        });
-
-        if (!isActive) return;
-
-        if (migrationError) {
-          nextContent = legacyContent;
-          migrationFailed = true;
-        } else {
-          nextContent = legacyContent;
-          clearLegacyContent();
-        }
+      if (needsDateAnchor) {
+        nextContent = appendDateAnchor(nextContent, currentDateValue);
+        nextEntryDate = currentDate;
       }
 
-      lastSavedContent.current = migrationFailed ? "" : nextContent;
+      const needsInitialSave = !data || Boolean(legacyContent) || needsDateAnchor;
+      let initialSaveError = null;
+
+      if (needsInitialSave) {
+        const { error: upsertError } = await supabase.from("notes").upsert({
+          user_id: userId,
+          content: nextContent,
+          last_entry_date: nextEntryDate,
+          updated_at: new Date().toISOString(),
+        });
+        initialSaveError = upsertError;
+
+        if (!isActive) return;
+        if (!upsertError && legacyContent) clearLegacyContent();
+      }
+
+      lastSaved.current = initialSaveError
+        ? { content: data?.content ?? "", entryDate: data?.last_entry_date ?? null }
+        : { content: nextContent, entryDate: nextEntryDate };
       setContent(nextContent);
-      setSaveStatus(migrationFailed ? "error" : "saved");
+      setEntryDate(nextEntryDate);
+      setSaveStatus(initialSaveError ? "error" : "saved");
       setIsNoteReady(true);
     }
 
@@ -130,11 +151,11 @@ function NotesView() {
   }, [userId]);
 
   useEffect(() => {
+    if (!supabase || !userId || !isNoteReady || !entryDate) return undefined;
+
     if (
-      !supabase ||
-      !userId ||
-      !isNoteReady ||
-      content === lastSavedContent.current
+      content === lastSaved.current.content &&
+      entryDate === lastSaved.current.entryDate
     ) {
       return undefined;
     }
@@ -144,6 +165,7 @@ function NotesView() {
       const { error } = await supabase.from("notes").upsert({
         user_id: userId,
         content,
+        last_entry_date: entryDate,
         updated_at: new Date().toISOString(),
       });
 
@@ -154,36 +176,39 @@ function NotesView() {
         return;
       }
 
-      lastSavedContent.current = content;
+      lastSaved.current = { content, entryDate };
       setSaveStatus("saved");
     }, SAVE_DELAY);
 
     return () => window.clearTimeout(timeout);
-  }, [content, isNoteReady, userId]);
+  }, [content, entryDate, isNoteReady, userId]);
+
+  useLayoutEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea || !isNoteReady) return;
+
+    textarea.style.height = "0px";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, [content, isNoteReady]);
 
   async function requestSignIn(event) {
     event.preventDefault();
-    if (!supabase || !password || authStatus === "sending") return;
+    if (!isAvailable || !password || authStatus === "sending") return;
 
     setAuthStatus("sending");
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email: OWNER_EMAIL,
-      password,
-    });
+    const { error } = await signIn(password);
 
     if (!error) setPassword("");
-    setAuthStatus(error ? "error" : "sent");
+    setAuthStatus(error ? "error" : "idle");
   }
 
-  async function signOut() {
-    if (!supabase) return;
-
-    await supabase.auth.signOut();
+  async function requestSignOut() {
+    saveRequest.current += 1;
+    await signOut();
     setPassword("");
   }
 
-  if (!isAuthReady) {
+  if (!isReady) {
     return (
       <section className="notes-gate page-scroll" aria-label="Notes loading">
         <p className="notes-gate__status">正在连接</p>
@@ -191,7 +216,7 @@ function NotesView() {
     );
   }
 
-  if (!session) {
+  if (!user) {
     const authMessage = {
       error: "无法解锁",
       unavailable: "连接不可用",
@@ -239,6 +264,7 @@ function NotesView() {
     <section className="notes-editor page-scroll" aria-label="Notes">
       <textarea
         className="notes-editor__textarea"
+        ref={textareaRef}
         value={content}
         onChange={(event) => {
           setContent(event.target.value);
@@ -253,7 +279,7 @@ function NotesView() {
           {statusText ?? ""}
         </span>
         <span aria-hidden="true">·</span>
-        <button className="notes-editor__signout" type="button" onClick={signOut}>
+        <button className="notes-editor__signout" type="button" onClick={requestSignOut}>
           退出
         </button>
       </div>
