@@ -778,7 +778,7 @@
 }
 
 .notes-gate__button,
-.notes-editor__lock {
+.notes-editor__signout {
   border: 0;
   background: transparent;
   color: var(--os-muted);
@@ -796,12 +796,17 @@
 }
 
 .notes-gate__button:hover,
-.notes-editor__lock:hover {
+.notes-editor__signout:hover {
   color: var(--os-text);
   opacity: 1;
 }
 
-.notes-gate__error {
+.notes-gate__button:disabled {
+  cursor: default;
+  opacity: 0.34;
+}
+
+.notes-gate__status {
   margin: 0;
   min-height: 1rem;
   color: var(--os-muted);
@@ -830,10 +835,27 @@
   letter-spacing: -0.01em;
 }
 
-.notes-editor__lock {
+.notes-editor__meta {
   position: absolute;
   right: 0;
   bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--os-muted);
+  font-size: 0.72rem;
+  opacity: 0.66;
+}
+
+.notes-editor__status {
+  min-width: 2.7rem;
+  text-align: right;
+}
+
+.notes-editor__signout {
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: 1;
 }
 
 /* ===== Mobile overrides ===== */
