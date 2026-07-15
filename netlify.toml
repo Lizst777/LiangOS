@@ -3,6 +3,18 @@
   publish = "dist"
 
 [[redirects]]
+  from = "http://liangos.netlify.app/*"
+  to = "https://lizst.cafe/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://liangos.netlify.app/*"
+  to = "https://lizst.cafe/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
