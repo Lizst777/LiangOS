@@ -993,6 +993,11 @@
   place-items: center;
 }
 
+.notes-gate {
+  align-content: center;
+  padding-bottom: 0;
+}
+
 .notes-gate__form {
   display: grid;
   justify-items: center;
