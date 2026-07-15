@@ -141,14 +141,14 @@ function NoteHistory({ currentNote, isOpen, onClose, onRestore, userId }) {
             transition={{ duration: 0.24 }}
           >
             <header className="note-history__header">
-              <h2 id="note-history-title">历史</h2>
+              <h2 id="note-history-title">History</h2>
               <button
                 className="note-history__close"
                 type="button"
                 onClick={onClose}
                 disabled={restoringId !== null}
-                aria-label="关闭历史"
-                title="关闭"
+                aria-label="Close history"
+                title="Close"
               >
                 <IconClose />
               </button>
@@ -156,13 +156,13 @@ function NoteHistory({ currentNote, isOpen, onClose, onRestore, userId }) {
 
             <div className="note-history__list">
               {loadState === "loading" && versions.length === 0 && (
-                <p className="note-history__empty">正在读取。</p>
+                <p className="note-history__empty">Loading.</p>
               )}
               {loadState === "error" && (
-                <p className="note-history__empty">暂时无法抵达。</p>
+                <p className="note-history__empty">History is unavailable.</p>
               )}
               {loadState === "ready" && versions.length === 0 && (
-                <p className="note-history__empty">还没有旧版本。</p>
+                <p className="note-history__empty">No earlier versions yet.</p>
               )}
               {versions.map((version) => (
                 <article className="note-version" key={version.id}>
@@ -177,10 +177,10 @@ function NoteHistory({ currentNote, isOpen, onClose, onRestore, userId }) {
                     aria-live="polite"
                   >
                     {restoringId === version.id
-                      ? "恢复中"
+                      ? "Restoring"
                       : restoreErrorId === version.id
-                        ? "未恢复"
-                        : "恢复"}
+                        ? "Not restored"
+                        : "Restore"}
                   </button>
                 </article>
               ))}

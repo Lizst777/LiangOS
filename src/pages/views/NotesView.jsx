@@ -324,15 +324,15 @@ function NotesView() {
   if (!isReady) {
     return (
       <section className="notes-gate page-scroll" aria-label="Notes loading">
-        <p className="notes-gate__status">正在连接</p>
+        <p className="notes-gate__status">Connecting</p>
       </section>
     );
   }
 
   if (!user) {
     const authMessage = {
-      error: "无法解锁",
-      unavailable: "连接不可用",
+      error: "Unable to unlock",
+      unavailable: "Connection unavailable",
     }[authStatus];
 
     return (
@@ -341,14 +341,14 @@ function NotesView() {
           <input
             className="notes-gate__input"
             type="password"
-            placeholder="密码"
+            placeholder="Password"
             value={password}
             onChange={(event) => {
               setPassword(event.target.value);
               if (authStatus === "error") setAuthStatus("idle");
             }}
             autoComplete="current-password"
-            aria-label="密码"
+            aria-label="Password"
             required
           />
           <button
@@ -356,7 +356,7 @@ function NotesView() {
             type="submit"
             disabled={authStatus === "sending" || authStatus === "unavailable"}
           >
-            {authStatus === "sending" ? "解锁中" : "解锁"}
+            {authStatus === "sending" ? "Unlocking" : "Unlock"}
           </button>
           <p className="notes-gate__status" aria-live="polite">
             {authMessage ?? ""}
@@ -367,16 +367,16 @@ function NotesView() {
   }
 
   const statusText = {
-    loading: "读取中",
-    saving: "保存中",
-    saved: "已保存",
-    error: "未保存",
+    loading: "Loading",
+    saving: "Saving",
+    saved: "Saved",
+    error: "Not saved",
   }[saveStatus];
   const exportLabel = {
-    idle: "导出",
-    exporting: "导出中",
-    exported: "已导出",
-    error: "未导出",
+    idle: "Export",
+    exporting: "Exporting",
+    exported: "Exported",
+    error: "Not exported",
   }[exportStatus];
 
   return (
@@ -408,7 +408,7 @@ function NotesView() {
               setIsHistoryOpen(true);
             }}
           >
-            历史
+            History
           </button>
           <span aria-hidden="true">·</span>
           <button
@@ -422,7 +422,7 @@ function NotesView() {
           </button>
           <span aria-hidden="true">·</span>
           <button className="notes-editor__action" type="button" onClick={requestSignOut}>
-            退出
+            Sign out
           </button>
         </div>
       </section>
