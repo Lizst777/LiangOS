@@ -1,10 +1,12 @@
+import { lazy, Suspense } from "react";
 import PageHeader from "../components/layout/PageHeader";
 import PageTransition from "../components/layout/PageTransition";
 import Sidebar from "../components/layout/Sidebar";
 import BottomNavigation from "../components/layout/BottomNavigation";
 import MobileHeader from "../components/layout/MobileHeader";
 import DashboardView from "./views/DashboardView";
-import NotesView from "./views/NotesView";
+
+const NotesView = lazy(() => import("./views/NotesView"));
 
 function DashboardShell({
   currentPage,
@@ -16,7 +18,17 @@ function DashboardShell({
   function renderView() {
     switch (currentPage) {
       case "notes":
-        return <NotesView />;
+        return (
+          <Suspense
+            fallback={
+              <section className="page-loading" aria-label="Notes loading">
+                <span>正在连接</span>
+              </section>
+            }
+          >
+            <NotesView />
+          </Suspense>
+        );
       default:
         return <DashboardView onOpenNotes={() => onPageChange("notes")} />;
     }

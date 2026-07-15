@@ -1,6 +1,17 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useOwnerSession } from "../../hooks/useOwnerSession";
 import { supabase } from "../../lib/supabase";
+import { exportPrivateData } from "../../utils/exportPrivateData";
+
+const NoteHistory = lazy(() => import("../../ui/NoteHistory"));
 
 const LEGACY_STORAGE_KEY = "liangos-notes-content";
 const SAVE_DELAY = 700;
@@ -58,9 +69,14 @@ function NotesView() {
   const [entryDate, setEntryDate] = useState(null);
   const [isNoteReady, setIsNoteReady] = useState(false);
   const [saveStatus, setSaveStatus] = useState("idle");
+  const [exportStatus, setExportStatus] = useState("idle");
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [hasOpenedHistory, setHasOpenedHistory] = useState(false);
   const textareaRef = useRef(null);
   const lastSaved = useRef({ content: "", entryDate: null });
   const saveRequest = useRef(0);
+  const saveTimerRef = useRef(null);
+  const exportTimerRef = useRef(null);
   const userId = user?.id ?? null;
 
   useEffect(() => {
@@ -161,7 +177,8 @@ function NotesView() {
     }
 
     const requestId = ++saveRequest.current;
-    const timeout = window.setTimeout(async () => {
+    saveTimerRef.current = window.setTimeout(async () => {
+      saveTimerRef.current = null;
       const { error } = await supabase.from("notes").upsert({
         user_id: userId,
         content,
@@ -180,8 +197,19 @@ function NotesView() {
       setSaveStatus("saved");
     }, SAVE_DELAY);
 
-    return () => window.clearTimeout(timeout);
+    return () => {
+      if (saveTimerRef.current) {
+        window.clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = null;
+      }
+    };
   }, [content, entryDate, isNoteReady, userId]);
+
+  useEffect(() => {
+    return () => {
+      if (exportTimerRef.current) window.clearTimeout(exportTimerRef.current);
+    };
+  }, []);
 
   useLayoutEffect(() => {
     const textarea = textareaRef.current;
@@ -190,6 +218,40 @@ function NotesView() {
     textarea.style.height = "0px";
     textarea.style.height = `${textarea.scrollHeight}px`;
   }, [content, isNoteReady]);
+
+  async function saveNow(nextContent = content, nextEntryDate = entryDate) {
+    if (!supabase || !userId || !nextEntryDate) {
+      return { error: new Error("Notes are unavailable.") };
+    }
+
+    if (saveTimerRef.current) {
+      window.clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
+
+    const requestId = ++saveRequest.current;
+    setSaveStatus("saving");
+
+    const { error } = await supabase.from("notes").upsert({
+      user_id: userId,
+      content: nextContent,
+      last_entry_date: nextEntryDate,
+      updated_at: new Date().toISOString(),
+    });
+
+    if (requestId !== saveRequest.current) {
+      return { error: new Error("A newer save replaced this request.") };
+    }
+
+    if (error) {
+      setSaveStatus("error");
+      return { error };
+    }
+
+    lastSaved.current = { content: nextContent, entryDate: nextEntryDate };
+    setSaveStatus("saved");
+    return { error: null };
+  }
 
   async function requestSignIn(event) {
     event.preventDefault();
@@ -203,10 +265,61 @@ function NotesView() {
   }
 
   async function requestSignOut() {
+    const hasUnsavedChanges =
+      isNoteReady &&
+      (content !== lastSaved.current.content || entryDate !== lastSaved.current.entryDate);
+
+    if (hasUnsavedChanges) {
+      const { error } = await saveNow();
+      if (error) return;
+    }
+
     saveRequest.current += 1;
+    setIsHistoryOpen(false);
     await signOut();
     setPassword("");
   }
+
+  async function requestExport() {
+    if (!supabase || !userId || exportStatus === "exporting") return;
+
+    if (exportTimerRef.current) window.clearTimeout(exportTimerRef.current);
+    setExportStatus("exporting");
+
+    try {
+      const hasUnsavedChanges =
+        content !== lastSaved.current.content || entryDate !== lastSaved.current.entryDate;
+
+      if (hasUnsavedChanges) {
+        const { error } = await saveNow();
+        if (error) throw error;
+      }
+
+      await exportPrivateData(supabase, userId);
+      setExportStatus("exported");
+    } catch {
+      setExportStatus("error");
+    }
+
+    exportTimerRef.current = window.setTimeout(() => setExportStatus("idle"), 1800);
+  }
+
+  async function restoreVersion(version) {
+    const restoredEntryDate = version.last_entry_date ?? getLocalDateKey();
+    const restoredContent = version.last_entry_date
+      ? version.content
+      : appendDateAnchor(version.content);
+    const result = await saveNow(restoredContent, restoredEntryDate);
+
+    if (!result.error) {
+      setContent(restoredContent);
+      setEntryDate(restoredEntryDate);
+    }
+
+    return result;
+  }
+
+  const closeHistory = useCallback(() => setIsHistoryOpen(false), []);
 
   if (!isReady) {
     return (
@@ -259,31 +372,73 @@ function NotesView() {
     saved: "已保存",
     error: "未保存",
   }[saveStatus];
+  const exportLabel = {
+    idle: "导出",
+    exporting: "导出中",
+    exported: "已导出",
+    error: "未导出",
+  }[exportStatus];
 
   return (
-    <section className="notes-editor page-scroll" aria-label="Notes">
-      <textarea
-        className="notes-editor__textarea"
-        ref={textareaRef}
-        value={content}
-        onChange={(event) => {
-          setContent(event.target.value);
-          setSaveStatus("saving");
-        }}
-        disabled={!isNoteReady}
-        autoFocus
-        aria-label="Notes"
-      />
-      <div className="notes-editor__meta">
-        <span className="notes-editor__status" aria-live="polite">
-          {statusText ?? ""}
-        </span>
-        <span aria-hidden="true">·</span>
-        <button className="notes-editor__signout" type="button" onClick={requestSignOut}>
-          退出
-        </button>
-      </div>
-    </section>
+    <>
+      <section className="notes-editor page-scroll" aria-label="Notes">
+        <textarea
+          className="notes-editor__textarea"
+          ref={textareaRef}
+          value={content}
+          onChange={(event) => {
+            setContent(event.target.value);
+            setSaveStatus("saving");
+          }}
+          disabled={!isNoteReady}
+          autoFocus
+          aria-label="Notes"
+        />
+        <div className="notes-editor__meta">
+          <span className="notes-editor__status" aria-live="polite">
+            {statusText ?? ""}
+          </span>
+          <span aria-hidden="true">·</span>
+          <button
+            className="notes-editor__action"
+            type="button"
+            disabled={!isNoteReady}
+            onClick={() => {
+              setHasOpenedHistory(true);
+              setIsHistoryOpen(true);
+            }}
+          >
+            历史
+          </button>
+          <span aria-hidden="true">·</span>
+          <button
+            className="notes-editor__action notes-editor__action--export"
+            type="button"
+            onClick={requestExport}
+            disabled={!isNoteReady || exportStatus === "exporting"}
+            aria-live="polite"
+          >
+            {exportLabel}
+          </button>
+          <span aria-hidden="true">·</span>
+          <button className="notes-editor__action" type="button" onClick={requestSignOut}>
+            退出
+          </button>
+        </div>
+      </section>
+
+      {hasOpenedHistory && (
+        <Suspense fallback={null}>
+          <NoteHistory
+            currentNote={{ content, entryDate }}
+            isOpen={isHistoryOpen}
+            onClose={closeHistory}
+            onRestore={restoreVersion}
+            userId={userId}
+          />
+        </Suspense>
+      )}
+    </>
   );
 }
 

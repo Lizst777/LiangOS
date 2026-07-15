@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { useOwnerSession } from "../hooks/useOwnerSession";
 import { supabase } from "../lib/supabase";
 import { getDaypart } from "../utils/daypart";
 import { prefersReducedMotion } from "../utils/gsapMotion";
-import MomentArchive from "./MomentArchive";
+
+const MomentArchive = lazy(() => import("./MomentArchive"));
 
 const MOMENT_AUTHOR = "此刻";
 
@@ -33,6 +34,7 @@ function MomentText({ weather, daypart, onOpenNotes }) {
   }));
   const [saveState, setSaveState] = useState("idle");
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
+  const [hasOpenedArchive, setHasOpenedArchive] = useState(false);
   const [archiveRefreshKey, setArchiveRefreshKey] = useState(0);
   const quoteRef = useRef(null);
   const statusTimerRef = useRef(null);
@@ -183,7 +185,10 @@ function MomentText({ weather, daypart, onOpenNotes }) {
               <button
                 className="moment-action"
                 type="button"
-                onClick={() => setIsArchiveOpen(true)}
+                onClick={() => {
+                  setHasOpenedArchive(true);
+                  setIsArchiveOpen(true);
+                }}
               >
                 痕迹
               </button>
@@ -196,12 +201,14 @@ function MomentText({ weather, daypart, onOpenNotes }) {
         </figcaption>
       </figure>
 
-      {user && (
-        <MomentArchive
-          isOpen={isArchiveOpen}
-          onClose={closeArchive}
-          refreshKey={archiveRefreshKey}
-        />
+      {user && hasOpenedArchive && (
+        <Suspense fallback={null}>
+          <MomentArchive
+            isOpen={isArchiveOpen}
+            onClose={closeArchive}
+            refreshKey={archiveRefreshKey}
+          />
+        </Suspense>
       )}
     </>
   );

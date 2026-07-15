@@ -579,8 +579,9 @@
   outline: none;
 }
 
-/* ===== Moment archive — private traces ===== */
-.moment-archive {
+/* ===== Private archives ===== */
+.moment-archive,
+.note-history {
   position: fixed;
   inset: 0;
   z-index: 200;
@@ -590,32 +591,37 @@
   scrollbar-width: none;
 }
 
-.moment-archive::-webkit-scrollbar {
+.moment-archive::-webkit-scrollbar,
+.note-history::-webkit-scrollbar {
   display: none;
 }
 
-.moment-archive__inner {
-  width: min(58rem, calc(100% - 6rem));
+.moment-archive__inner,
+.note-history__inner {
+  width: min(64rem, calc(100% - 6rem));
   min-height: 100%;
   margin: 0 auto;
   padding: clamp(3rem, 8vh, 6.5rem) 0 clamp(5rem, 10vh, 8rem);
 }
 
-.moment-archive__header {
+.moment-archive__header,
+.note-history__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: clamp(4rem, 10vh, 8rem);
 }
 
-.moment-archive__header h2 {
+.moment-archive__header h2,
+.note-history__header h2 {
   margin: 0;
   font-size: clamp(1.1rem, 1.8vw, 1.5rem);
   font-weight: 500;
   letter-spacing: 0;
 }
 
-.moment-archive__close {
+.moment-archive__close,
+.note-history__close {
   display: grid;
   width: 2.5rem;
   height: 2.5rem;
@@ -630,17 +636,21 @@
 }
 
 .moment-archive__close:hover,
-.moment-archive__close:focus-visible {
+.moment-archive__close:focus-visible,
+.note-history__close:hover,
+.note-history__close:focus-visible {
   color: var(--os-text);
   opacity: 1;
   outline: none;
 }
 
-.moment-archive__list {
+.moment-archive__list,
+.note-history__list {
   display: grid;
 }
 
-.moment-archive__empty {
+.moment-archive__empty,
+.note-history__empty {
   margin: 0;
   color: var(--os-muted);
   font-size: 0.86rem;
@@ -649,7 +659,7 @@
 
 .moment-trace {
   display: grid;
-  grid-template-columns: minmax(10rem, 0.7fr) minmax(14rem, 1.5fr) minmax(10rem, 1fr);
+  grid-template-columns: minmax(10rem, 0.72fr) minmax(16rem, 1.5fr) minmax(10rem, 0.9fr) auto;
   align-items: baseline;
   gap: clamp(1rem, 3vw, 2.5rem);
   padding: clamp(1.35rem, 2.5vh, 2rem) 0;
@@ -660,8 +670,8 @@
   border-top: 1px solid color-mix(in srgb, var(--os-muted) 18%, transparent);
 }
 
-.moment-trace time,
-.moment-trace span {
+.moment-trace__time,
+.moment-trace__weather {
   color: var(--os-muted);
   font-size: 0.76rem;
   line-height: 1.6;
@@ -674,6 +684,121 @@
   font-size: clamp(1.05rem, 1.7vw, 1.35rem);
   font-weight: 430;
   line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.moment-trace__edit {
+  min-width: 0;
+}
+
+.moment-trace__edit textarea {
+  display: block;
+  width: 100%;
+  min-height: 3.2rem;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--os-muted) 34%, transparent);
+  border-radius: 0;
+  background: transparent;
+  color: var(--os-text);
+  resize: vertical;
+  outline: none;
+  font: inherit;
+  font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+  font-weight: 430;
+  line-height: 1.6;
+}
+
+.moment-trace__edit textarea:focus {
+  border-color: color-mix(in srgb, var(--os-text) 48%, transparent);
+}
+
+.moment-trace__actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  justify-self: end;
+  min-width: 5.5rem;
+  color: var(--os-muted);
+  font-size: 0.72rem;
+  line-height: 1.6;
+  opacity: 0.62;
+}
+
+.moment-trace__actions button,
+.note-version button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  opacity: 0.72;
+  transition: color 180ms var(--ease-out), opacity 180ms var(--ease-out);
+}
+
+.moment-trace__actions button:hover,
+.moment-trace__actions button:focus-visible,
+.note-version button:hover,
+.note-version button:focus-visible {
+  color: var(--os-text);
+  opacity: 1;
+  outline: none;
+}
+
+.moment-trace__actions button:disabled,
+.note-version button:disabled,
+.note-history__close:disabled {
+  cursor: wait;
+  opacity: 0.36;
+}
+
+.note-version {
+  display: grid;
+  grid-template-columns: minmax(10rem, 0.72fr) minmax(0, 1.8fr) 4rem;
+  align-items: baseline;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  padding: clamp(1.35rem, 2.5vh, 2rem) 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--os-muted) 18%, transparent);
+}
+
+.note-version:first-child {
+  border-top: 1px solid color-mix(in srgb, var(--os-muted) 18%, transparent);
+}
+
+.note-version time {
+  color: var(--os-muted);
+  font-size: 0.76rem;
+  line-height: 1.6;
+  opacity: 0.64;
+}
+
+.note-version p {
+  margin: 0;
+  color: var(--os-text);
+  font-size: clamp(0.94rem, 1.25vw, 1.08rem);
+  font-weight: 410;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.note-version button {
+  justify-self: end;
+  color: var(--os-muted);
+  font-size: 0.72rem;
+  line-height: 1.6;
+  opacity: 0.62;
+}
+
+.page-loading {
+  min-height: calc(100svh - 12rem);
+  display: grid;
+  place-items: center;
+  color: var(--os-muted);
+  font-size: 0.72rem;
+  opacity: 0.58;
 }
 
 /* ===== Editorial shared language ===== */
@@ -899,7 +1024,7 @@
 }
 
 .notes-gate__button,
-.notes-editor__signout {
+.notes-editor__action {
   border: 0;
   background: transparent;
   color: var(--os-muted);
@@ -917,12 +1042,15 @@
 }
 
 .notes-gate__button:hover,
-.notes-editor__signout:hover {
+.notes-editor__action:hover,
+.notes-editor__action:focus-visible {
   color: var(--os-text);
   opacity: 1;
+  outline: none;
 }
 
-.notes-gate__button:disabled {
+.notes-gate__button:disabled,
+.notes-editor__action:disabled {
   cursor: default;
   opacity: 0.34;
 }
@@ -978,10 +1106,15 @@
   text-align: right;
 }
 
-.notes-editor__signout {
+.notes-editor__action {
   letter-spacing: 0;
   text-transform: none;
   opacity: 1;
+}
+
+.notes-editor__action--export {
+  width: 3.4em;
+  text-align: center;
 }
 
 /* ===== Mobile overrides ===== */
@@ -1196,28 +1329,70 @@
     font-size: inherit;
   }
 
-  .moment-archive__inner {
+  .moment-archive__inner,
+  .note-history__inner {
     width: min(100% - 2.5rem, 38rem);
     padding-top: calc(2rem + env(safe-area-inset-top));
   }
 
-  .moment-archive__header {
+  .moment-archive__header,
+  .note-history__header {
     margin-bottom: clamp(2.5rem, 8vh, 4.5rem);
   }
 
   .moment-trace {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 0.5rem;
     padding: 1.35rem 0;
   }
 
-  .moment-trace p {
+  .moment-trace p,
+  .moment-trace__edit {
+    grid-column: 1 / -1;
     grid-row: 1;
     font-size: clamp(1.05rem, 5vw, 1.3rem);
   }
 
+  .moment-trace__time {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .moment-trace__weather {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .moment-trace__actions {
+    grid-column: 2;
+    grid-row: 2 / span 2;
+    align-self: center;
+  }
+
+  .note-version {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.55rem 1rem;
+    padding: 1.35rem 0;
+  }
+
+  .note-version p {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .note-version time {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .note-version button {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
   .notes-gate,
   .notes-editor,
+  .page-loading,
   .search-surface,
   .tools-surface,
   .music-surface {
