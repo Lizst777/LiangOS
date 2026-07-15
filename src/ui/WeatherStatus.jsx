@@ -37,111 +37,70 @@ function normalizeWeatherText(value) {
   return WEATHER_TEXT[value] || value;
 }
 
-function normalizeLocationName(value) {
-  if (!value) return "Rizhao, Shandong";
-
-  if (
-    value.includes("日照") ||
-    value.includes("东港") ||
-    value.toLowerCase().includes("rizhao")
-  ) {
-    return "Rizhao, Shandong";
-  }
-
-  if (value.includes("东京") || value.toLowerCase().includes("tokyo")) {
-    return "Tokyo, Japan";
-  }
-
-  return value;
-}
-
-const DEFAULT_LOCATION = {
-  latitude: 35.42,
-  longitude: 119.46,
-  name: "Rizhao, Shandong",
-};
-
-let cachedWeather = null;
-let defaultWeatherPromise = null;
-let preciseWeatherPromise = null;
-
-async function loadWeather(
-  longitude,
-  latitude,
-  fallbackLocation,
-  { resolveLocation = true } = {},
-) {
+async function loadWeather(longitude, latitude) {
   const weatherRequest = fetchQWeather(longitude, latitude);
-  const locationRequest = resolveLocation
-    ? getQWeatherLocationName(longitude, latitude).catch(() => fallbackLocation)
-    : Promise.resolve(fallbackLocation);
+  const locationRequest = getQWeatherLocationName(longitude, latitude).catch(
+    () => null,
+  );
   const [data, location] = await Promise.all([weatherRequest, locationRequest]);
 
   return {
     temperature: data.temperature,
     text: normalizeWeatherText(data.weatherText),
-    location: normalizeLocationName(location || fallbackLocation),
+    location,
   };
 }
 
-function getDefaultWeather() {
-  if (!defaultWeatherPromise) {
-    defaultWeatherPromise = loadWeather(
-      DEFAULT_LOCATION.longitude,
-      DEFAULT_LOCATION.latitude,
-      DEFAULT_LOCATION.name,
-      { resolveLocation: false },
-    ).catch(() => null);
-  }
-
-  return defaultWeatherPromise;
-}
-
-function getPreciseWeather() {
-  if (!navigator.geolocation) return Promise.resolve(null);
-
-  if (!preciseWeatherPromise) {
-    preciseWeatherPromise = new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(resolve, reject, {
-        maximumAge: 30 * 60 * 1000,
-        timeout: 6000,
-      });
-    })
-      .then(({ coords }) =>
-        loadWeather(coords.longitude, coords.latitude, DEFAULT_LOCATION.name),
-      )
-      .catch(() => null);
-  }
-
-  return preciseWeatherPromise;
-}
-
 function WeatherStatus({ onWeatherChange }) {
-  const [weather, setWeather] = useState(cachedWeather);
+  const [weather, setWeather] = useState(null);
 
   useEffect(() => {
     let active = true;
+    let latestRequest = 0;
+    let lastPositionKey = null;
 
     function commitWeather(nextWeather) {
       if (!active || !nextWeather) return;
-      cachedWeather = nextWeather;
       setWeather(nextWeather);
       onWeatherChange?.(nextWeather);
     }
 
-    async function load() {
-      if (cachedWeather) commitWeather(cachedWeather);
-
-      const preciseWeatherRequest = getPreciseWeather();
-      await getDefaultWeather().then(commitWeather);
-      const preciseWeather = await preciseWeatherRequest;
-      commitWeather(preciseWeather);
+    if (!navigator.geolocation) {
+      return () => {
+        active = false;
+      };
     }
 
-    load();
+    const watchId = navigator.geolocation.watchPosition(
+      ({ coords }) => {
+        const { latitude, longitude } = coords;
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
+
+        const positionKey = `${longitude.toFixed(3)},${latitude.toFixed(3)}`;
+        if (positionKey === lastPositionKey) return;
+        lastPositionKey = positionKey;
+
+        const request = ++latestRequest;
+        loadWeather(longitude, latitude)
+          .then((nextWeather) => {
+            if (request === latestRequest) commitWeather(nextWeather);
+          })
+          .catch(() => {
+            if (!active || request !== latestRequest) return;
+            setWeather(null);
+            onWeatherChange?.(null);
+          });
+      },
+      () => {},
+      {
+        enableHighAccuracy: false,
+        maximumAge: 0,
+      },
+    );
 
     return () => {
       active = false;
+      navigator.geolocation.clearWatch(watchId);
     };
   }, [onWeatherChange]);
 
@@ -156,7 +115,7 @@ function WeatherStatus({ onWeatherChange }) {
         <div className="weather-status__copy">
           <strong>{weather.temperature}°C</strong>
           <span>{weather.text}</span>
-          <span>{weather.location}</span>
+          {weather.location ? <span>{weather.location}</span> : null}
         </div>
       </div>
     </div>

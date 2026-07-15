@@ -8,41 +8,11 @@ function ensureKey() {
   }
 }
 
-function appendCitySuffix(value) {
-  if (!value || typeof value !== 'string') return value;
-  if (/[市区县]$/.test(value)) return value;
-  return `${value}市`;
-}
-
-function shouldAddCitySuffix(adm2, name) {
-  if (!adm2 || !name) return false;
-  if (adm2 === name) return false;
-  if (/[市区县]$/.test(adm2)) return false;
-  return !/[市区县]$/.test(name);
-}
-
 function formatLocationName(location) {
-  if (!location || typeof location !== 'object') return null;
+  if (!location || typeof location !== "object") return null;
 
-  const { adm1, adm2, name } = location;
-  if (!name) return null;
-
-  const regionName = name;
-  const cityName = adm2 || adm1;
-
-  if (!cityName) {
-    return regionName;
-  }
-
-  if (cityName === regionName) {
-    return regionName;
-  }
-
-  const normalizedCity = shouldAddCitySuffix(cityName, regionName)
-    ? appendCitySuffix(cityName)
-    : cityName;
-
-  return `${normalizedCity} · ${regionName}`;
+  const name = location.name?.trim();
+  return name || null;
 }
 
 async function fetchJsonResponse(url) {
@@ -122,12 +92,12 @@ export async function getQWeatherLocationName(longitude, latitude) {
     }
 
     if (res.ok && data && data.code === '200' && Array.isArray(data.location) && data.location[0]) {
-      return formatLocationName(data.location[0]) || "Location unavailable";
+      return formatLocationName(data.location[0]);
     }
 
   }
 
-  return "Location unavailable";
+  return null;
 }
 
 export default fetchQWeather;
