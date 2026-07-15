@@ -1,19 +1,11 @@
 export const NAV_ITEMS = [
-  { id: "dashboard", label: "Overview", icon: "grid" },
+  { id: "dashboard", label: "Home", icon: "home" },
   { id: "notes", label: "Notes", icon: "note" },
 ];
 
 export const PAGE_META = {
   dashboard: {
-    title: "Overview",
-    description: "",
-  },
-  search: {
-    title: "Search",
-    description: "",
-  },
-  music: {
-    title: "Music",
+    title: "Home",
     description: "",
   },
   notes: {

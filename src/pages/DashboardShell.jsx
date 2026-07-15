@@ -14,6 +14,7 @@ function DashboardShell({
   resolvedTheme,
   onThemeToggle,
   onPageChange,
+  registerBeforePageChange,
 }) {
   function renderView() {
     switch (currentPage) {
@@ -22,15 +23,15 @@ function DashboardShell({
           <Suspense
             fallback={
               <section className="page-loading" aria-label="Notes loading">
-                <span>正在连接</span>
+                <span>Connecting</span>
               </section>
             }
           >
-            <NotesView />
+            <NotesView registerBeforeLeave={registerBeforePageChange} />
           </Suspense>
         );
       default:
-        return <DashboardView onOpenNotes={() => onPageChange("notes")} />;
+        return <DashboardView />;
     }
   }
 

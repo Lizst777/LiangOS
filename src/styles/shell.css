@@ -44,13 +44,13 @@
   justify-content: center;
   font-size: var(--font-sm);
   font-weight: 650;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 .sidebar__logo-text {
   font-size: var(--font-lg);
   font-weight: 650;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
   color: var(--os-text);
   white-space: nowrap;
 }
@@ -65,13 +65,16 @@
 
 .sidebar__item {
   position: relative;
-  display: block;
-  width: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   padding: 0;
   border: none;
   background: transparent;
   color: color-mix(in srgb, var(--os-muted) 78%, transparent);
-  font-size: clamp(0.74rem, 0.72vw, 0.84rem);
+  font-size: 0.8rem;
   font-weight: 450;
   letter-spacing: 0.025em;
   line-height: 1.35;
@@ -81,7 +84,6 @@
     color 180ms var(--ease-out),
     opacity 180ms var(--ease-out),
     transform 180ms var(--ease-out);
-  height: auto;
   box-shadow: none;
   font-family: inherit;
   opacity: 0.52;
@@ -91,7 +93,7 @@
   color: var(--os-text);
   background: transparent;
   opacity: 0.9;
-  transform: translateX(2px);
+  transform: translateY(-1px);
 }
 
 .sidebar__item--active {
@@ -115,7 +117,24 @@
 }
 
 .sidebar__item-icon {
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.sidebar__item:focus-visible,
+.sidebar__action:focus-visible {
+  color: var(--os-text);
+  opacity: 1;
+  outline: 1px solid color-mix(in srgb, currentColor 36%, transparent);
+  outline-offset: 3px;
+}
+
+.sidebar__item-icon svg {
+  width: 17px;
+  height: 17px;
 }
 
 .sidebar__item--active .sidebar__item-icon {
@@ -144,8 +163,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   border: none;
   background: transparent;
@@ -251,7 +270,7 @@
 .page-header__meta {
   display: none;
   margin-top: var(--space-3);
-  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  font-size: 0.8rem;
   color: var(--os-muted);
 }
 
@@ -276,6 +295,11 @@
   inset: 0;
   z-index: 0;
   background-image: url('/bg.jpg');
+  background-image: image-set(
+    url('/bg-1920.avif') type('image/avif'),
+    url('/bg-1920.webp') type('image/webp'),
+    url('/bg.jpg') type('image/jpeg')
+  );
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -402,9 +426,9 @@
 .time-display__hours,
 .time-display__minutes {
   display: block;
-  font-size: clamp(7.5rem, 16vw, 15rem);
+  font-size: 13.5rem;
   font-weight: 620;
-  letter-spacing: -0.055em;
+  letter-spacing: 0;
   line-height: 0.86;
   color: var(--os-text);
 }
@@ -413,9 +437,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(7.5rem, 16vw, 15rem);
+  font-size: 13.5rem;
   font-weight: 620;
-  letter-spacing: -0.055em;
+  letter-spacing: 0;
   line-height: 0.86;
   color: var(--os-text);
   transform: translateY(-0.04em);
@@ -423,10 +447,10 @@
 
 .time-display__date {
   grid-area: date;
-  font-size: clamp(1rem, 1.65vw, 1.45rem);
+  font-size: 1.25rem;
   font-weight: 440;
   color: var(--os-text);
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
   opacity: 0.86;
 }
 
@@ -453,7 +477,7 @@
   display: block;
   min-width: 2.6rem;
   color: var(--os-muted);
-  font-size: clamp(2rem, 3vw, 2.6rem);
+  font-size: 2.3rem;
   line-height: 1;
   text-align: center;
   opacity: 0.86;
@@ -468,17 +492,17 @@
 
 .weather-status__copy strong {
   color: var(--os-text);
-  font-size: clamp(1.65rem, 2.4vw, 2.4rem);
+  font-size: 2.1rem;
   font-weight: 540;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
   line-height: 1;
 }
 
 .weather-status__copy span {
   color: var(--os-muted);
-  font-size: clamp(0.8rem, 1vw, 1rem);
+  font-size: 0.9rem;
   font-weight: 430;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
   line-height: 1.35;
 }
 
@@ -493,7 +517,7 @@
   min-height: clamp(7rem, 13vh, 10rem);
   margin-top: clamp(1.1rem, 2.4vh, 2.2rem);
   color: rgba(255, 255, 255, 0.86);
-  font-size: clamp(2rem, 3.35vw, 2.75rem);
+  font-size: 2.5rem;
   font-weight: 410;
   letter-spacing: 0;
   line-height: 1.28;
@@ -534,7 +558,7 @@
   gap: 0.42rem;
   margin-top: clamp(0.72rem, 1.25vh, 1rem);
   color: rgba(255, 255, 255, 0.48);
-  font-size: clamp(0.875rem, 1.1vw, 1.125rem);
+  font-size: 1rem;
   font-weight: 390;
   line-height: 1.4;
 }
@@ -615,7 +639,7 @@
 .moment-archive__header h2,
 .note-history__header h2 {
   margin: 0;
-  font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+  font-size: 1.25rem;
   font-weight: 500;
   letter-spacing: 0;
 }
@@ -681,7 +705,7 @@
 .moment-trace p {
   margin: 0;
   color: var(--os-text);
-  font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+  font-size: 1.2rem;
   font-weight: 430;
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -704,7 +728,7 @@
   resize: vertical;
   outline: none;
   font: inherit;
-  font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+  font-size: 1.2rem;
   font-weight: 430;
   line-height: 1.6;
 }
@@ -777,7 +801,7 @@
 .note-version p {
   margin: 0;
   color: var(--os-text);
-  font-size: clamp(0.94rem, 1.25vw, 1.08rem);
+  font-size: 1rem;
   font-weight: 410;
   line-height: 1.75;
   white-space: pre-wrap;
@@ -849,9 +873,9 @@
   color: var(--os-text);
   padding: 0.28rem 0 0.7rem;
   font: inherit;
-  font-size: clamp(2.6rem, 8vw, 6.5rem);
+  font-size: 4.5rem;
   font-weight: 520;
-  letter-spacing: -0.065em;
+  letter-spacing: 0;
   line-height: 0.95;
   outline: none;
 }
@@ -957,9 +981,9 @@
 
 .editorial-list__item span {
   color: var(--os-text);
-  font-size: clamp(1rem, 1.45vw, 1.35rem);
+  font-size: 1.15rem;
   font-weight: 470;
-  letter-spacing: -0.025em;
+  letter-spacing: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1074,6 +1098,17 @@
   padding-bottom: clamp(5rem, 12vh, 9rem);
 }
 
+.notes-editor__date {
+  display: block;
+  width: min(72rem, 100%);
+  margin: 0 auto clamp(2rem, 5vh, 4rem);
+  color: var(--os-muted);
+  font-size: 0.78rem;
+  font-weight: 430;
+  letter-spacing: 0.02em;
+  opacity: 0.66;
+}
+
 .notes-editor__textarea {
   display: block;
   width: min(72rem, 100%);
@@ -1086,10 +1121,10 @@
   resize: none;
   outline: none;
   font: inherit;
-  font-size: clamp(1rem, 1.35vw, 1.35rem);
+  font-size: 1.2rem;
   font-weight: 430;
   line-height: 1.9;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
 .notes-editor__meta {
@@ -1120,6 +1155,17 @@
 .notes-editor__action--export {
   width: 3.4em;
   text-align: center;
+}
+
+@media (max-width: 767px) {
+  .workspace__background {
+    background-image: url('/bg.jpg');
+    background-image: image-set(
+      url('/bg-1440.avif') type('image/avif'),
+      url('/bg-1440.webp') type('image/webp'),
+      url('/bg.jpg') type('image/jpeg')
+    );
+  }
 }
 
 /* ===== Mobile overrides ===== */
@@ -1177,6 +1223,65 @@
     background: color-mix(in srgb, var(--os-bg) 78%, transparent);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
+  }
+
+  .mobile-header__copy {
+    display: flex;
+    min-width: 0;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .mobile-header__brand {
+    color: var(--os-muted);
+    font-size: 0.72rem;
+    font-weight: 460;
+    opacity: 0.52;
+  }
+
+  .mobile-header__title {
+    color: inherit;
+    font-size: 0.82rem;
+    font-weight: 520;
+    letter-spacing: 0;
+  }
+
+  .mobile-header__theme {
+    position: relative;
+    display: inline-flex;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    margin: -0.5rem -0.65rem -0.5rem 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--os-muted);
+    cursor: pointer;
+    opacity: 0.66;
+  }
+
+  .mobile-header__theme:hover,
+  .mobile-header__theme:focus-visible {
+    color: var(--os-text);
+    opacity: 1;
+    outline: none;
+  }
+
+  .mobile-header__theme svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .mobile-header__theme span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .mobile-header--dashboard {
@@ -1311,23 +1416,23 @@
   .time-display__hours,
   .time-display__minutes,
   .time-display__colon {
-    font-size: clamp(4.5rem, 20vw, 6.25rem);
+    font-size: 5.25rem;
   }
 
   .time-display__date {
-    font-size: clamp(0.86rem, 4vw, 1.05rem);
+    font-size: 0.95rem;
   }
 
   .moment {
     width: min(88vw, 28rem);
     min-height: clamp(6.25rem, 14vh, 8rem);
     margin-top: clamp(0.85rem, 2.2vh, 1.5rem);
-    font-size: clamp(1.25rem, 6vw, 1.75rem);
+    font-size: 1.5rem;
   }
 
   .moment-meta {
     margin-top: 0.65rem;
-    font-size: clamp(0.875rem, 3.6vw, 1rem);
+    font-size: 0.925rem;
   }
 
   .moment-action {
@@ -1355,7 +1460,7 @@
   .moment-trace__edit {
     grid-column: 1 / -1;
     grid-row: 1;
-    font-size: clamp(1.05rem, 5vw, 1.3rem);
+    font-size: 1.15rem;
   }
 
   .moment-trace__time {
@@ -1421,7 +1526,7 @@
   }
 
   .editorial-input {
-    font-size: clamp(2.5rem, 16vw, 4.5rem);
+    font-size: 3rem;
   }
 
   .editorial-list__item {
@@ -1451,7 +1556,7 @@
   align-items: center;
   gap: 0;
   width: 100%;
-  max-width: 24rem;
+  max-width: 4rem;
   min-height: 2.85rem;
   margin: 0 auto;
   padding: 0;
@@ -1478,7 +1583,7 @@
   align-items: center;
   justify-content: center;
   gap: 2px;
-  flex: 1;
+  flex: 0 0 44px;
   min-width: 44px;
   min-height: 44px;
   padding: 0;
@@ -1489,7 +1594,7 @@
   cursor: pointer;
   font-size: 8.5px;
   font-weight: 460;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
   transition:
     color var(--duration-fast) var(--ease-out),
     opacity var(--duration-fast) var(--ease-out),
@@ -1563,13 +1668,13 @@
   .time-display__hours,
   .time-display__minutes,
   .time-display__colon {
-    font-size: clamp(6rem, 13vw, 10.5rem);
+    font-size: 9.75rem;
   }
 
   .moment {
     min-height: 6.25rem;
     margin-top: 0.7rem;
-    font-size: clamp(1.75rem, 2.8vw, 2.35rem);
+    font-size: 2rem;
   }
 }
 
@@ -1582,12 +1687,12 @@
   .time-display__hours,
   .time-display__minutes,
   .time-display__colon {
-    font-size: clamp(4rem, 18vw, 5.4rem);
+    font-size: 4.5rem;
   }
 
   .moment {
     min-height: 5.25rem;
     margin-top: 0.55rem;
-    font-size: clamp(1.25rem, 5.4vw, 1.55rem);
+    font-size: 1.35rem;
   }
 }

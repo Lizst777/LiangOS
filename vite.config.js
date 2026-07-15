@@ -35,28 +35,4 @@ export default defineConfig({
       },
     },
   },
-  server: {
-    proxy: {
-      "/netease-api": {
-        target: "https://music.163.com",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/netease-api/, ""),
-        headers: {
-          Referer: "https://music.163.com",
-        },
-      },
-    },
-  },
-  preview: {
-    proxy: {
-      "/netease-api": {
-        target: "https://music.163.com",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/netease-api/, ""),
-        headers: {
-          Referer: "https://music.163.com",
-        },
-      },
-    },
-  },
 })

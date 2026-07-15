@@ -1,16 +1,49 @@
-# React + Vite
+# LiangOS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+LiangOS is a quiet personal standby space built with React and Vite. The public
+home keeps time, date, weather, and a short Moment in view. Notes and saved
+Moments are private Supabase data protected by authentication and row-level
+security.
 
-Currently, two official plugins are available:
+## Local development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Requirements: Node.js 22+ and npm.
 
-## React Compiler
+```powershell
+npm.cmd install
+npm.cmd run dev
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Create `.env.local` from `.env.example` and provide the project-specific values.
+Vite exposes every `VITE_` variable to the browser, so only use a Supabase
+publishable key here. Never use a secret or `service_role` key in the frontend.
 
-## Expanding the ESLint configuration
+## Verification
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```powershell
+npm.cmd run lint
+npm.cmd run build
+```
+
+The production build is written to `dist/`. Netlify uses the build and publish
+settings in `netlify.toml`.
+
+## Data model
+
+- `moments`: public read-only seed phrases.
+- `moment_traces`: Moments saved by the authenticated owner.
+- `daily_notes`: one private note per owner and local calendar date.
+- `daily_note_versions`: automatic private snapshots before content updates.
+- `notes` and `note_versions`: legacy data retained during the daily-note
+  transition.
+
+Database changes are versioned in `supabase/migrations`. Apply pending files
+through the Supabase migration workflow before deploying frontend code that
+depends on them. New public-schema tables must receive explicit grants and have
+RLS enabled; LiangOS migrations do both.
+
+## Privacy
+
+Private queries always include the authenticated `user_id` in addition to RLS.
+The frontend does not store Notes or Moments in `localStorage`. Export creates a
+local JSON file containing the private chronological timeline.

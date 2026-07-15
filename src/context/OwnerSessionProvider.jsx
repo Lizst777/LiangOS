@@ -13,11 +13,20 @@ function OwnerSessionProvider({ children }) {
 
     let isActive = true;
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (!isActive) return;
-      setSession(data.session);
-      setIsReady(true);
-    });
+    async function restoreSession() {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        if (isActive) setSession(data.session);
+      } catch {
+        await supabase.auth.signOut({ scope: "local" }).catch(() => undefined);
+        if (isActive) setSession(null);
+      } finally {
+        if (isActive) setIsReady(true);
+      }
+    }
+
+    void restoreSession();
 
     const {
       data: { subscription },

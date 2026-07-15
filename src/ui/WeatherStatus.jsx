@@ -55,45 +55,87 @@ function normalizeLocationName(value) {
   return value;
 }
 
+const DEFAULT_LOCATION = {
+  latitude: 35.42,
+  longitude: 119.46,
+  name: "Rizhao, Shandong",
+};
+
+let cachedWeather = null;
+let defaultWeatherPromise = null;
+let preciseWeatherPromise = null;
+
+async function loadWeather(
+  longitude,
+  latitude,
+  fallbackLocation,
+  { resolveLocation = true } = {},
+) {
+  const weatherRequest = fetchQWeather(longitude, latitude);
+  const locationRequest = resolveLocation
+    ? getQWeatherLocationName(longitude, latitude).catch(() => fallbackLocation)
+    : Promise.resolve(fallbackLocation);
+  const [data, location] = await Promise.all([weatherRequest, locationRequest]);
+
+  return {
+    temperature: data.temperature,
+    text: normalizeWeatherText(data.weatherText),
+    location: normalizeLocationName(location || fallbackLocation),
+  };
+}
+
+function getDefaultWeather() {
+  if (!defaultWeatherPromise) {
+    defaultWeatherPromise = loadWeather(
+      DEFAULT_LOCATION.longitude,
+      DEFAULT_LOCATION.latitude,
+      DEFAULT_LOCATION.name,
+      { resolveLocation: false },
+    ).catch(() => null);
+  }
+
+  return defaultWeatherPromise;
+}
+
+function getPreciseWeather() {
+  if (!navigator.geolocation) return Promise.resolve(null);
+
+  if (!preciseWeatherPromise) {
+    preciseWeatherPromise = new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        maximumAge: 30 * 60 * 1000,
+        timeout: 6000,
+      });
+    })
+      .then(({ coords }) =>
+        loadWeather(coords.longitude, coords.latitude, DEFAULT_LOCATION.name),
+      )
+      .catch(() => null);
+  }
+
+  return preciseWeatherPromise;
+}
+
 function WeatherStatus({ onWeatherChange }) {
-  const [weather, setWeather] = useState(null);
+  const [weather, setWeather] = useState(cachedWeather);
 
   useEffect(() => {
     let active = true;
 
     function commitWeather(nextWeather) {
-      if (!active) return;
+      if (!active || !nextWeather) return;
+      cachedWeather = nextWeather;
       setWeather(nextWeather);
       onWeatherChange?.(nextWeather);
     }
 
     async function load() {
-      try {
-        const position = await new Promise((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
-        });
+      if (cachedWeather) commitWeather(cachedWeather);
 
-        const { latitude, longitude } = position.coords;
-        const data = await fetchQWeather(longitude, latitude);
-        const name = await getQWeatherLocationName(longitude, latitude);
-
-        commitWeather({
-          temperature: data.temperature,
-          text: normalizeWeatherText(data.weatherText),
-          location: normalizeLocationName(name),
-        });
-      } catch {
-        try {
-          const data = await fetchQWeather(119.46, 35.42);
-          commitWeather({
-            temperature: data.temperature,
-            text: normalizeWeatherText(data.weatherText),
-            location: "Rizhao, Shandong",
-          });
-        } catch {
-          commitWeather(null);
-        }
-      }
+      const preciseWeatherRequest = getPreciseWeather();
+      await getDefaultWeather().then(commitWeather);
+      const preciseWeather = await preciseWeatherRequest;
+      commitWeather(preciseWeather);
     }
 
     load();

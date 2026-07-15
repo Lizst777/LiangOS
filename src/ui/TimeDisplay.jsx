@@ -11,12 +11,24 @@ const weekdayFormatter = new Intl.DateTimeFormat("en-US", {
   weekday: "long",
 });
 
-function TimeDisplay({ weather, daypart, onOpenNotes }) {
+function TimeDisplay({ weather, daypart }) {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
+    let timer;
+
+    function updateAtMinuteBoundary() {
+      const now = new Date();
+      setTime(now);
+      const elapsedInMinute = now.getSeconds() * 1000 + now.getMilliseconds();
+      timer = window.setTimeout(updateAtMinuteBoundary, 60_050 - elapsedInMinute);
+    }
+
+    const now = new Date();
+    const elapsedInMinute = now.getSeconds() * 1000 + now.getMilliseconds();
+    timer = window.setTimeout(updateAtMinuteBoundary, 60_050 - elapsedInMinute);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   const hours = String(time.getHours()).padStart(2, "0");
@@ -33,7 +45,7 @@ function TimeDisplay({ weather, daypart, onOpenNotes }) {
         <span className="time-display__minutes">{minutes}</span>
       </time>
       <div className="time-display__date">{date}</div>
-      <MomentText weather={weather} daypart={daypart} onOpenNotes={onOpenNotes} />
+      <MomentText weather={weather} daypart={daypart} />
     </div>
   );
 }

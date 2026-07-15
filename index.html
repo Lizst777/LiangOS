@@ -4,7 +4,22 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <link rel="preload" href="/bg.jpg" as="image" fetchpriority="high" />
+    <link
+      rel="preload"
+      href="/bg-1920.avif"
+      as="image"
+      type="image/avif"
+      media="(min-width: 768px)"
+      fetchpriority="high"
+    />
+    <link
+      rel="preload"
+      href="/bg-1440.avif"
+      as="image"
+      type="image/avif"
+      media="(max-width: 767px)"
+      fetchpriority="high"
+    />
     <title>LiangOS</title>
   </head>
   <body>

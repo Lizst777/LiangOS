@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { useDialogFocus } from "../hooks/useDialogFocus";
 import { useOwnerSession } from "../hooks/useOwnerSession";
 import { supabase } from "../lib/supabase";
 import { IconClose } from "./Icons";
@@ -33,8 +34,11 @@ function MomentArchive({ isOpen, onClose, refreshKey }) {
   const [confirmingDeleteId, setConfirmingDeleteId] = useState(null);
   const [pendingAction, setPendingAction] = useState(null);
   const [feedback, setFeedback] = useState(null);
+  const dialogRef = useRef(null);
   const feedbackTimerRef = useRef(null);
   const userId = user?.id ?? null;
+
+  useDialogFocus(isOpen, dialogRef);
 
   const closeArchive = useCallback(() => {
     setEditingId(null);
@@ -205,6 +209,8 @@ function MomentArchive({ isOpen, onClose, refreshKey }) {
         >
           <motion.div
             className="moment-archive__inner"
+            ref={dialogRef}
+            tabIndex={-1}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
@@ -218,6 +224,7 @@ function MomentArchive({ isOpen, onClose, refreshKey }) {
                 onClick={closeArchive}
                 aria-label="关闭痕迹"
                 title="关闭"
+                data-dialog-initial-focus
               >
                 <IconClose />
               </button>

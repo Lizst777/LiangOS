@@ -1,8 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { useDialogFocus } from "../hooks/useDialogFocus";
 import { supabase } from "../lib/supabase";
 import { IconClose } from "./Icons";
+
+const entryDateFormatter = new Intl.DateTimeFormat("en-US", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
 
 const versionDateFormatter = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
@@ -13,46 +20,104 @@ const versionDateFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
 });
 
+function getDateFromKey(value) {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day, 12);
+}
+
 function getPreview(content) {
   const compact = content.trim();
-  if (!compact) return "空白";
+  if (!compact) return "Blank";
   return compact.length > 320 ? `…${compact.slice(-320)}` : compact;
 }
 
-function NoteHistory({ currentNote, isOpen, onClose, onRestore, userId }) {
-  const [versions, setVersions] = useState([]);
+function mergeHistory(entries, versions, moments) {
+  return [
+    ...entries.map((entry) => ({
+      ...entry,
+      key: `entry-${entry.id}`,
+      kind: "entry",
+      sortTime: `${entry.entry_date}T23:59:59`,
+    })),
+    ...versions.map((version) => ({
+      ...version,
+      key: `version-${version.id}`,
+      kind: "version",
+      sortTime: version.created_at,
+    })),
+    ...moments.map((moment) => ({
+      ...moment,
+      key: `moment-${moment.id}`,
+      kind: "moment",
+      sortTime: moment.created_at,
+    })),
+  ].sort((left, right) => new Date(right.sortTime) - new Date(left.sortTime));
+}
+
+function NoteHistory({
+  currentEntry,
+  isOpen,
+  onClose,
+  onOpenEntry,
+  onRestore,
+  userId,
+}) {
+  const [items, setItems] = useState([]);
   const [loadState, setLoadState] = useState("idle");
-  const [restoringId, setRestoringId] = useState(null);
-  const [restoreErrorId, setRestoreErrorId] = useState(null);
+  const [pendingId, setPendingId] = useState(null);
+  const [errorId, setErrorId] = useState(null);
+  const dialogRef = useRef(null);
+
+  useDialogFocus(isOpen, dialogRef);
 
   useEffect(() => {
     if (!isOpen || !supabase || !userId) return undefined;
 
     let isActive = true;
 
-    async function loadVersions() {
+    async function loadHistory() {
       setLoadState("loading");
-      setRestoreErrorId(null);
+      setErrorId(null);
 
-      const { data, error } = await supabase
-        .from("note_versions")
-        .select("id, content, last_entry_date, created_at")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
-        .limit(80);
+      const [entriesResult, versionsResult, momentsResult] = await Promise.all([
+        supabase
+          .from("daily_notes")
+          .select("id, entry_date, content, updated_at")
+          .eq("user_id", userId)
+          .order("entry_date", { ascending: false })
+          .limit(180),
+        supabase
+          .from("daily_note_versions")
+          .select("id, entry_date, content, created_at")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false })
+          .limit(160),
+        supabase
+          .from("moment_traces")
+          .select("id, content, created_at")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false })
+          .limit(160),
+      ]);
 
       if (!isActive) return;
 
-      if (error) {
+      if (entriesResult.error || versionsResult.error || momentsResult.error) {
         setLoadState("error");
         return;
       }
 
-      setVersions(data ?? []);
+      setItems(
+        mergeHistory(
+          entriesResult.data ?? [],
+          versionsResult.data ?? [],
+          momentsResult.data ?? [],
+        ),
+      );
       setLoadState("ready");
     }
 
-    loadVersions();
+    loadHistory();
 
     return () => {
       isActive = false;
@@ -66,7 +131,7 @@ function NoteHistory({ currentNote, isOpen, onClose, onRestore, userId }) {
     document.body.style.overflow = "hidden";
 
     function closeOnEscape(event) {
-      if (event.key === "Escape" && restoringId === null) onClose();
+      if (event.key === "Escape" && pendingId === null) onClose();
     }
 
     window.addEventListener("keydown", closeOnEscape);
@@ -75,46 +140,37 @@ function NoteHistory({ currentNote, isOpen, onClose, onRestore, userId }) {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", closeOnEscape);
     };
-  }, [isOpen, onClose, restoringId]);
+  }, [isOpen, onClose, pendingId]);
 
-  async function restoreVersion(version) {
-    if (!supabase || !userId || restoringId !== null) return;
+  async function selectItem(item) {
+    if (pendingId !== null) return;
 
     const isCurrent =
-      currentNote.content === version.content &&
-      currentNote.entryDate === version.last_entry_date;
-
+      item.kind !== "moment" &&
+      currentEntry.entryDate === item.entry_date &&
+      (item.kind === "entry" || currentEntry.content === item.content);
     if (isCurrent) {
       onClose();
       return;
     }
 
-    setRestoringId(version.id);
-    setRestoreErrorId(null);
+    setPendingId(item.key);
+    setErrorId(null);
 
     try {
-      const { error: snapshotError } = await supabase.from("note_versions").insert({
-        user_id: userId,
-        content: currentNote.content,
-        last_entry_date: currentNote.entryDate,
-      });
+      const result =
+        item.kind === "entry" ? await onOpenEntry(item.entry_date) : await onRestore(item);
 
-      if (snapshotError) {
-        setRestoreErrorId(version.id);
-        return;
-      }
-
-      const { error } = await onRestore(version);
-      if (error) {
-        setRestoreErrorId(version.id);
+      if (result?.error) {
+        setErrorId(item.key);
         return;
       }
 
       onClose();
     } catch {
-      setRestoreErrorId(version.id);
+      setErrorId(item.key);
     } finally {
-      setRestoringId(null);
+      setPendingId(null);
     }
   }
 
@@ -135,55 +191,79 @@ function NoteHistory({ currentNote, isOpen, onClose, onRestore, userId }) {
         >
           <motion.div
             className="note-history__inner"
+            ref={dialogRef}
+            tabIndex={-1}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.24 }}
           >
             <header className="note-history__header">
-              <h2 id="note-history-title">History</h2>
+              <h2 id="note-history-title">Timeline</h2>
               <button
                 className="note-history__close"
                 type="button"
                 onClick={onClose}
-                disabled={restoringId !== null}
-                aria-label="Close history"
+                disabled={pendingId !== null}
+                aria-label="Close timeline"
                 title="Close"
+                data-dialog-initial-focus
               >
                 <IconClose />
               </button>
             </header>
 
             <div className="note-history__list">
-              {loadState === "loading" && versions.length === 0 && (
+              {loadState === "loading" && items.length === 0 && (
                 <p className="note-history__empty">Loading.</p>
               )}
               {loadState === "error" && (
-                <p className="note-history__empty">History is unavailable.</p>
+                <p className="note-history__empty">Timeline is unavailable.</p>
               )}
-              {loadState === "ready" && versions.length === 0 && (
-                <p className="note-history__empty">No earlier versions yet.</p>
+              {loadState === "ready" && items.length === 0 && (
+                <p className="note-history__empty">No earlier entries yet.</p>
               )}
-              {versions.map((version) => (
-                <article className="note-version" key={version.id}>
-                  <time dateTime={version.created_at}>
-                    {versionDateFormatter.format(new Date(version.created_at))}
-                  </time>
-                  <p>{getPreview(version.content)}</p>
-                  <button
-                    type="button"
-                    onClick={() => restoreVersion(version)}
-                    disabled={restoringId !== null}
-                    aria-live="polite"
-                  >
-                    {restoringId === version.id
-                      ? "Restoring"
-                      : restoreErrorId === version.id
-                        ? "Not restored"
-                        : "Restore"}
-                  </button>
-                </article>
-              ))}
+              {items.map((item) => {
+                const isCurrent =
+                  item.kind !== "moment" &&
+                  currentEntry.entryDate === item.entry_date &&
+                  (item.kind === "entry" || currentEntry.content === item.content);
+                const isPending = pendingId === item.key;
+                const label = isCurrent
+                  ? "Current"
+                  : isPending
+                    ? item.kind === "entry"
+                      ? "Opening"
+                      : "Restoring"
+                    : errorId === item.key
+                      ? item.kind === "entry"
+                        ? "Not opened"
+                        : "Not restored"
+                      : item.kind === "entry"
+                        ? "Open"
+                        : "Restore";
+
+                return (
+                  <article className="note-version" key={item.key}>
+                    <time dateTime={item.kind === "entry" ? item.entry_date : item.created_at}>
+                      {item.kind === "entry"
+                        ? entryDateFormatter.format(getDateFromKey(item.entry_date))
+                        : `${item.kind === "moment" ? "Moment" : "Version"} · ${versionDateFormatter.format(new Date(item.created_at))}`}
+                    </time>
+                    <p>{getPreview(item.content)}</p>
+                    {item.kind !== "moment" && (
+                      <button
+                        type="button"
+                        onClick={() => void selectItem(item)}
+                        disabled={pendingId !== null || isCurrent}
+                        aria-live="polite"
+                      >
+                        {label}
+                      </button>
+                    )}
+                  </article>
+                );
+              })}
             </div>
           </motion.div>
         </motion.section>

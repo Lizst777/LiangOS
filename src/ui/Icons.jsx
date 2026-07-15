@@ -100,6 +100,15 @@ export function IconMonitor() {
   );
 }
 
+export function IconHome() {
+  return (
+    <svg {...iconProps}>
+      <path d="M3 11.5 12 4l9 7.5" />
+      <path d="M5.5 10.5V20h13v-9.5M9.5 20v-6h5v6" />
+    </svg>
+  );
+}
+
 export function IconClose() {
   return (
     <svg {...iconProps}>
@@ -119,6 +128,7 @@ export function IconChevron({ direction = "left" }) {
 
 const ICON_MAP = {
   grid: IconGrid,
+  home: IconHome,
   search: IconSearch,
   compass: IconCompass,
   music: IconMusic,

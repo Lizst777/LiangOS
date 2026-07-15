@@ -5,7 +5,7 @@ import { getDaypart } from "../../utils/daypart";
 
 const SOFT_WEATHER = /rain|fog|haze|overcast|snow|shower|thunder/i;
 
-function DashboardView({ onOpenNotes }) {
+function DashboardView() {
   const [weather, setWeather] = useState(null);
   const [daypart, setDaypart] = useState(() => getDaypart());
 
@@ -23,15 +23,11 @@ function DashboardView({ onOpenNotes }) {
     .join(" ");
 
   return (
-    <main className={workspaceClass} aria-label="Overview">
+    <section className={workspaceClass} aria-label="Home">
       <div className="workspace__background" aria-hidden />
       <WeatherStatus onWeatherChange={setWeather} />
-      <TimeDisplay
-        weather={weather}
-        daypart={daypart}
-        onOpenNotes={onOpenNotes}
-      />
-    </main>
+      <TimeDisplay weather={weather} daypart={daypart} />
+    </section>
   );
 }
 

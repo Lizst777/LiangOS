@@ -1,5 +1,4 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import gsap from "gsap";
 import { useOwnerSession } from "../hooks/useOwnerSession";
 import { supabase } from "../lib/supabase";
 import { getDaypart } from "../utils/daypart";
@@ -26,7 +25,7 @@ function isChineseMoment(value) {
   return typeof value === "string" && /[\u3400-\u9fff]/.test(value);
 }
 
-function MomentText({ weather, daypart, onOpenNotes }) {
+function MomentText({ weather, daypart }) {
   const { isReady, user } = useOwnerSession();
   const [momentState, setMomentState] = useState(() => ({
     content: getMomentAfter("", daypart),
@@ -39,6 +38,7 @@ function MomentText({ weather, daypart, onOpenNotes }) {
   const quoteRef = useRef(null);
   const statusTimerRef = useRef(null);
   const motionFrameRef = useRef(null);
+  const lastSavedMomentRef = useRef(null);
   const userId = user?.id ?? null;
   const localFallback = useMemo(() => getMomentAfter("", daypart), [daypart]);
   const moment =
@@ -50,6 +50,7 @@ function MomentText({ weather, daypart, onOpenNotes }) {
     if (!isReady) return undefined;
 
     let active = true;
+    lastSavedMomentRef.current = null;
     async function loadMoment() {
       if (!supabase) return;
 
@@ -70,6 +71,7 @@ function MomentText({ weather, daypart, onOpenNotes }) {
         const { data, error } = await query;
 
         if (!active || error || !isChineseMoment(data?.content)) return;
+        if (userId) lastSavedMomentRef.current = data.content;
         setMomentState({ content: data.content, ownerId: userId });
       } catch {
         // The local sentence remains visible when Supabase is unavailable.
@@ -108,16 +110,31 @@ function MomentText({ weather, daypart, onOpenNotes }) {
     if (motionFrameRef.current) window.cancelAnimationFrame(motionFrameRef.current);
 
     motionFrameRef.current = window.requestAnimationFrame(() => {
-      gsap.fromTo(
-        quoteRef.current,
-        { autoAlpha: 0.76, y: 3 },
-        { autoAlpha: 1, y: 0, duration: 0.22, ease: "power2.out", overwrite: "auto" },
-      );
+      void import("gsap")
+        .then(({ default: gsap }) => {
+          if (!quoteRef.current) return;
+          gsap.fromTo(
+            quoteRef.current,
+            { autoAlpha: 0.76, y: 3 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.22,
+              ease: "power2.out",
+              overwrite: "auto",
+            },
+          );
+        })
+        .catch(() => undefined);
     });
   }
 
   async function saveMoment() {
     if (!user || saveState === "saving") return;
+    if (lastSavedMomentRef.current === moment) {
+      showSaveState("saved");
+      return;
+    }
     if (!supabase) {
       showSaveState("error");
       return;
@@ -140,6 +157,7 @@ function MomentText({ weather, daypart, onOpenNotes }) {
         return;
       }
 
+      lastSavedMomentRef.current = moment;
       setArchiveRefreshKey((value) => value + 1);
       showSaveState("saved");
     } catch {
@@ -158,16 +176,22 @@ function MomentText({ weather, daypart, onOpenNotes }) {
   return (
     <>
       <figure className="moment">
-        <button className="moment-quote" type="button" onClick={nextMoment} ref={quoteRef}>
+        <button
+          className="moment-quote"
+          type="button"
+          onClick={nextMoment}
+          ref={quoteRef}
+          lang="zh-CN"
+        >
           {moment}
         </button>
-        <figcaption className="moment-meta">
+        <figcaption className="moment-meta" lang="zh-CN">
           <span className="moment-author">{MOMENT_AUTHOR}</span>
-          <span className="moment-divider" aria-hidden>
-            ·
-          </span>
-          {user ? (
+          {user && (
             <>
+              <span className="moment-divider" aria-hidden>
+                ·
+              </span>
               <button
                 className="moment-action moment-action--save"
                 type="button"
@@ -193,10 +217,6 @@ function MomentText({ weather, daypart, onOpenNotes }) {
                 痕迹
               </button>
             </>
-          ) : (
-            <button className="moment-action" type="button" onClick={onOpenNotes}>
-              解锁
-            </button>
           )}
         </figcaption>
       </figure>

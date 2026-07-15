@@ -3,13 +3,21 @@ function throwIfError(result) {
   return result.data;
 }
 
+function getLocalDateKey(value) {
+  const date = new Date(value);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export async function exportPrivateData(supabase, userId) {
-  const [noteResult, tracesResult, versionsResult] = await Promise.all([
+  const [notesResult, tracesResult, versionsResult, legacyNoteResult] = await Promise.all([
     supabase
-      .from("notes")
-      .select("content, last_entry_date, updated_at")
+      .from("daily_notes")
+      .select("content, entry_date, created_at, updated_at")
       .eq("user_id", userId)
-      .maybeSingle(),
+      .order("entry_date", { ascending: false }),
     supabase
       .from("moment_traces")
       .select(
@@ -18,19 +26,49 @@ export async function exportPrivateData(supabase, userId) {
       .eq("user_id", userId)
       .order("created_at", { ascending: false }),
     supabase
-      .from("note_versions")
-      .select("content, last_entry_date, created_at")
+      .from("daily_note_versions")
+      .select("content, entry_date, created_at")
       .eq("user_id", userId)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("notes")
+      .select("content, last_entry_date, updated_at")
+      .eq("user_id", userId)
+      .maybeSingle(),
   ]);
+
+  const dailyNotes = throwIfError(notesResult) ?? [];
+  const momentTraces = throwIfError(tracesResult) ?? [];
+  const dailyNoteVersions = throwIfError(versionsResult) ?? [];
+  const legacyNote = throwIfError(legacyNoteResult);
+  const timeline = [
+    ...dailyNotes.map((note) => ({
+      type: "note",
+      occurred_at: note.updated_at,
+      entry_date: note.entry_date,
+      content: note.content,
+    })),
+    ...momentTraces.map((trace) => ({
+      type: "moment",
+      occurred_at: trace.created_at,
+      entry_date: getLocalDateKey(trace.created_at),
+      content: trace.content,
+      weather_text: trace.weather_text,
+      temperature: trace.temperature,
+      location: trace.location,
+      daypart: trace.daypart,
+    })),
+  ].sort((left, right) => new Date(right.occurred_at) - new Date(left.occurred_at));
 
   const payload = {
     schema: "liangos.private-data",
-    version: 1,
+    version: 2,
     exported_at: new Date().toISOString(),
-    note: throwIfError(noteResult),
-    moment_traces: throwIfError(tracesResult) ?? [],
-    note_versions: throwIfError(versionsResult) ?? [],
+    timeline,
+    daily_notes: dailyNotes,
+    moment_traces: momentTraces,
+    daily_note_versions: dailyNoteVersions,
+    legacy_note: legacyNote,
   };
 
   const blob = new Blob([`${JSON.stringify(payload, null, 2)}\n`], {

@@ -50,7 +50,7 @@ export function getNextTheme(theme) {
 }
 
 export function getThemeLabel(theme) {
-  if (theme === "light") return "浅色";
-  if (theme === "dark") return "深色";
-  return "跟随";
+  if (theme === "light") return "Light";
+  if (theme === "dark") return "Dark";
+  return "System";
 }

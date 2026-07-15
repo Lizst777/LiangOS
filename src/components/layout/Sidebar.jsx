@@ -1,12 +1,5 @@
 import { NAV_ITEMS } from "../../constants/navigation";
-import { IconMoon, IconSun, IconMonitor } from "../../ui/Icons";
-
-const EDITORIAL_LABELS = {
-  dashboard: "Overview",
-  search: "Search",
-  music: "Music",
-  notes: "Notes",
-};
+import { IconMoon, IconSun, IconMonitor, NavIcon } from "../../ui/Icons";
 
 function ThemeIcon({ theme }) {
   if (theme === "light") return <IconSun />;
@@ -15,29 +8,22 @@ function ThemeIcon({ theme }) {
 }
 
 function Sidebar({ page, theme, onPageChange, onThemeToggle }) {
+  const destination = NAV_ITEMS.find((item) => item.id !== page) ?? NAV_ITEMS[0];
+
   return (
     <aside className="sidebar hidden lg:flex" aria-label="Workspace navigation">
       <nav className="sidebar__nav" aria-label="Workspace navigation">
-        {NAV_ITEMS.map((item) => {
-          const label = EDITORIAL_LABELS[item.id] ?? item.label;
-
-          return (
-            <button
-              key={item.id}
-              type="button"
-              className={
-                page === item.id
-                  ? "sidebar__item sidebar__item--active"
-                  : "sidebar__item"
-              }
-              onClick={() => onPageChange(item.id)}
-              aria-current={page === item.id ? "page" : undefined}
-              title={label}
-            >
-              <span className="sidebar__item-label">{label}</span>
-            </button>
-          );
-        })}
+        <button
+          type="button"
+          className="sidebar__item"
+          onClick={() => onPageChange(destination.id)}
+          aria-label={destination.label}
+          title={destination.label}
+        >
+          <span className="sidebar__item-icon">
+            <NavIcon name={destination.icon} />
+          </span>
+        </button>
       </nav>
 
       <div className="sidebar__footer">
