@@ -311,6 +311,7 @@
   inset: 0;
   pointer-events: none;
   background: var(--workspace-overlay);
+  transition: background-color 320ms var(--ease-out);
 }
 
 .workspace--morning {
@@ -464,6 +465,19 @@
   background: transparent;
   border: 0;
   box-shadow: none;
+  animation: weather-status-enter 240ms var(--ease-out) both;
+}
+
+@keyframes weather-status-enter {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .weather-status__inner {

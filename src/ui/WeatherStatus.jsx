@@ -32,16 +32,19 @@ const WEATHER_ICON = {
   Snow: "✦",
 };
 
+const LOCATION_MAX_AGE_MS = 60_000;
+const WEATHER_REFRESH_MS = 10 * 60_000;
+
 function normalizeWeatherText(value) {
   if (!value) return "Cloudy";
   return WEATHER_TEXT[value] || value;
 }
 
-async function loadWeather(longitude, latitude) {
+async function loadWeather(longitude, latitude, knownLocation = null) {
   const weatherRequest = fetchQWeather(longitude, latitude);
-  const locationRequest = getQWeatherLocationName(longitude, latitude).catch(
-    () => null,
-  );
+  const locationRequest = knownLocation
+    ? Promise.resolve(knownLocation)
+    : getQWeatherLocationName(longitude, latitude).catch(() => null);
   const [data, location] = await Promise.all([weatherRequest, locationRequest]);
 
   return {
@@ -56,13 +59,103 @@ function WeatherStatus({ onWeatherChange }) {
 
   useEffect(() => {
     let active = true;
+    let watchId = null;
     let latestRequest = 0;
-    let lastPositionKey = null;
+    let latestPosition = null;
+    let pendingPositionKey = null;
+    let lastRequestKey = null;
+    let lastRequestAt = 0;
+    let locationKey = null;
+    let locationName = null;
 
     function commitWeather(nextWeather) {
       if (!active || !nextWeather) return;
       setWeather(nextWeather);
       onWeatherChange?.(nextWeather);
+    }
+
+    async function refreshWeather(position, { force = false } = {}) {
+      if (!active) return;
+
+      const { latitude, longitude, key } = position;
+      const now = Date.now();
+      const hasFreshRequest =
+        key === lastRequestKey && now - lastRequestAt < WEATHER_REFRESH_MS;
+
+      if ((!force && hasFreshRequest) || pendingPositionKey === key) return;
+
+      lastRequestKey = key;
+      lastRequestAt = now;
+      pendingPositionKey = key;
+      const request = ++latestRequest;
+      const knownLocation = key === locationKey ? locationName : null;
+
+      try {
+        const nextWeather = await loadWeather(
+          longitude,
+          latitude,
+          knownLocation,
+        );
+
+        if (!active || request !== latestRequest) return;
+        if (nextWeather.location) {
+          locationKey = key;
+          locationName = nextWeather.location;
+        }
+        commitWeather(nextWeather);
+      } catch {
+        // Keep the last valid weather during temporary location or API failures.
+      } finally {
+        if (request === latestRequest) pendingPositionKey = null;
+      }
+    }
+
+    function handlePosition({ coords }) {
+      if (!active) return;
+
+      const { latitude, longitude } = coords;
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
+
+      latestPosition = {
+        latitude,
+        longitude,
+        key: `${longitude.toFixed(3)},${latitude.toFixed(3)}`,
+      };
+
+      if (document.visibilityState === "visible") {
+        void refreshWeather(latestPosition);
+      }
+    }
+
+    function startLocationWatch() {
+      if (
+        !active ||
+        watchId !== null ||
+        document.visibilityState !== "visible"
+      ) {
+        return;
+      }
+
+      watchId = navigator.geolocation.watchPosition(handlePosition, () => {}, {
+        enableHighAccuracy: false,
+        maximumAge: LOCATION_MAX_AGE_MS,
+      });
+    }
+
+    function stopLocationWatch() {
+      if (watchId === null) return;
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+    }
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        startLocationWatch();
+        if (latestPosition) void refreshWeather(latestPosition);
+        return;
+      }
+
+      stopLocationWatch();
     }
 
     if (!navigator.geolocation) {
@@ -71,36 +164,20 @@ function WeatherStatus({ onWeatherChange }) {
       };
     }
 
-    const watchId = navigator.geolocation.watchPosition(
-      ({ coords }) => {
-        const { latitude, longitude } = coords;
-        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
-
-        const positionKey = `${longitude.toFixed(3)},${latitude.toFixed(3)}`;
-        if (positionKey === lastPositionKey) return;
-        lastPositionKey = positionKey;
-
-        const request = ++latestRequest;
-        loadWeather(longitude, latitude)
-          .then((nextWeather) => {
-            if (request === latestRequest) commitWeather(nextWeather);
-          })
-          .catch(() => {
-            if (!active || request !== latestRequest) return;
-            setWeather(null);
-            onWeatherChange?.(null);
-          });
-      },
-      () => {},
-      {
-        enableHighAccuracy: false,
-        maximumAge: 0,
-      },
-    );
+    startLocationWatch();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    const refreshTimer = window.setInterval(() => {
+      if (document.visibilityState === "visible" && latestPosition) {
+        void refreshWeather(latestPosition, { force: true });
+      }
+    }, WEATHER_REFRESH_MS);
 
     return () => {
       active = false;
-      navigator.geolocation.clearWatch(watchId);
+      latestRequest += 1;
+      stopLocationWatch();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.clearInterval(refreshTimer);
     };
   }, [onWeatherChange]);
 
@@ -115,7 +192,7 @@ function WeatherStatus({ onWeatherChange }) {
         <div className="weather-status__copy">
           <strong>{weather.temperature}°C</strong>
           <span>{weather.text}</span>
-          {weather.location ? <span>{weather.location}</span> : null}
+          {weather.location ? <span lang="zh-CN">{weather.location}</span> : null}
         </div>
       </div>
     </div>

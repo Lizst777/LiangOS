@@ -71,10 +71,14 @@ export async function getQWeatherLocationName(longitude, latitude) {
   ensureKey();
 
   const geoHosts = [
-    QWEATHER_GEO_HOST,
-    "https://geoapi.qweather.com",
-    QWEATHER_HOST,
-  ].filter(Boolean);
+    ...new Set(
+      [
+        QWEATHER_GEO_HOST,
+        "https://geoapi.qweather.com",
+        QWEATHER_HOST,
+      ].filter(Boolean),
+    ),
+  ];
 
   for (const host of geoHosts) {
     const url = `${host}/geo/v2/city/lookup?location=${longitude},${latitude}&key=${QWEATHER_KEY}&lang=zh`;
