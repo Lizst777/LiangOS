@@ -8,7 +8,7 @@ function BottomNavigation({ page, onPageChange }) {
 
   return (
     <motion.nav
-      className="bottom-nav"
+      className={`bottom-nav bottom-nav--${page}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={motionTransition}
@@ -20,10 +20,12 @@ function BottomNavigation({ page, onPageChange }) {
           className="bottom-nav__item"
           onClick={() => onPageChange(destination.id)}
           aria-label={destination.label}
-          title={destination.label}
         >
           <span className="bottom-nav__icon">
             <NavIcon name={destination.icon} />
+          </span>
+          <span className="bottom-nav__label" aria-hidden="true">
+            {destination.label}
           </span>
         </button>
       </div>

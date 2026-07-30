@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useOwnerSession } from "../../hooks/useOwnerSession";
 import { supabase } from "../../lib/supabase";
+import ConnectionStatus from "../../ui/ConnectionStatus";
 import { exportPrivateData } from "../../utils/exportPrivateData";
 
 const NoteHistory = lazy(() => import("../../ui/NoteHistory"));
@@ -65,6 +66,7 @@ function NotesView({ registerBeforeLeave }) {
     userId: null,
   });
   const saveQueueRef = useRef(Promise.resolve({ error: null }));
+  const activeFlushRef = useRef(null);
   const loadRequestRef = useRef(0);
   const saveTimerRef = useRef(null);
   const exportTimerRef = useRef(null);
@@ -148,32 +150,44 @@ function NotesView({ registerBeforeLeave }) {
   }, []);
 
   const flushPendingSave = useCallback(
-    async ({ quiet = false } = {}) => {
-      if (saveTimerRef.current) {
-        window.clearTimeout(saveTimerRef.current);
-        saveTimerRef.current = null;
-      }
+    ({ quiet = false } = {}) => {
+      if (activeFlushRef.current) return activeFlushRef.current;
 
-      await saveQueueRef.current;
+      const flush = (async () => {
+        if (saveTimerRef.current) {
+          window.clearTimeout(saveTimerRef.current);
+          saveTimerRef.current = null;
+        }
 
-      for (let attempt = 0; attempt < 3; attempt += 1) {
-        const draft = { ...latestDraftRef.current };
-        if (!draft.isReady || !draft.userId) return true;
+        await saveQueueRef.current;
 
-        const isSaved =
-          draft.content === lastSavedRef.current.content &&
-          draft.entryDate === lastSavedRef.current.entryDate;
-        if (isSaved) return true;
+        for (let attempt = 0; attempt < 3; attempt += 1) {
+          const draft = { ...latestDraftRef.current };
+          if (!draft.isReady || !draft.userId) return true;
 
-        const { error } = await persistEntry(draft, { quiet });
-        if (error) return false;
-      }
+          const isSaved =
+            draft.content === lastSavedRef.current.content &&
+            draft.entryDate === lastSavedRef.current.entryDate;
+          if (isSaved) return true;
 
-      const latest = latestDraftRef.current;
-      return (
-        latest.content === lastSavedRef.current.content &&
-        latest.entryDate === lastSavedRef.current.entryDate
-      );
+          const { error } = await persistEntry(draft, { quiet });
+          if (error) return false;
+        }
+
+        const latest = latestDraftRef.current;
+        return (
+          latest.content === lastSavedRef.current.content &&
+          latest.entryDate === lastSavedRef.current.entryDate
+        );
+      })();
+
+      const trackedFlush = flush.finally(() => {
+        if (activeFlushRef.current === trackedFlush) {
+          activeFlushRef.current = null;
+        }
+      });
+      activeFlushRef.current = trackedFlush;
+      return trackedFlush;
     },
     [persistEntry],
   );
@@ -309,6 +323,7 @@ function NotesView({ registerBeforeLeave }) {
   useLayoutEffect(() => {
     const textarea = textareaRef.current;
     if (!textarea || !isNoteReady) return;
+    if (window.CSS?.supports?.("field-sizing", "content")) return;
 
     textarea.style.height = "0px";
     textarea.style.height = `${textarea.scrollHeight}px`;
@@ -416,7 +431,7 @@ function NotesView({ registerBeforeLeave }) {
   if (!isReady) {
     return (
       <section className="notes-gate page-scroll" aria-label="Notes loading">
-        <p className="notes-gate__status">Connecting</p>
+        <ConnectionStatus className="notes-gate__status" />
       </section>
     );
   }
@@ -494,7 +509,6 @@ function NotesView({ registerBeforeLeave }) {
             setContent(nextContent);
             setSaveStatus("saving");
           }}
-          onBlur={() => void flushPendingSave()}
           disabled={!isNoteReady}
           autoFocus
           aria-label={`Notes for ${formatEntryDate(entryDate)}`}
