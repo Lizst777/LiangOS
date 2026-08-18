@@ -2,7 +2,7 @@ import { NAV_ITEMS } from "../../constants/navigation";
 import { NavIcon } from "../../ui/Icons";
 
 const LIQUID_DOCK_FILTER =
-  "blur(30px) saturate(190%) contrast(105%)";
+  "blur(20px) saturate(165%) brightness(112%)";
 const LIQUID_DOCK_STYLE = {
   backdropFilter: LIQUID_DOCK_FILTER,
   WebkitBackdropFilter: LIQUID_DOCK_FILTER,
