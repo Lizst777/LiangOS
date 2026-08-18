@@ -1,8 +1,0 @@
-.tools-surface__command {
-  display: grid;
-  gap: 0.85rem;
-}
-
-.tools-surface__list {
-  margin-top: clamp(0.5rem, 2vh, 1.5rem);
-}

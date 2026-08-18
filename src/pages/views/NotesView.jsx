@@ -8,8 +8,6 @@ import {
   useState,
 } from "react";
 import { useOwnerSession } from "../../hooks/useOwnerSession";
-import { supabase } from "../../lib/supabase";
-import ConnectionStatus from "../../ui/ConnectionStatus";
 import { exportPrivateData } from "../../utils/exportPrivateData";
 
 const NoteHistory = lazy(() => import("../../ui/NoteHistory"));
@@ -43,8 +41,15 @@ function formatEntryDate(value) {
   return `${dateFormatter.format(date)} · ${weekdayFormatter.format(date)}`;
 }
 
-function NotesView({ registerBeforeLeave }) {
-  const { isAvailable, isReady, user, signIn, signOut } = useOwnerSession();
+function NotesView({ isActive = false, registerBeforeLeave }) {
+  const {
+    client: supabase,
+    ensureClient,
+    isAvailable,
+    user,
+    signIn,
+    signOut,
+  } = useOwnerSession();
   const [password, setPassword] = useState("");
   const [authStatus, setAuthStatus] = useState(isAvailable ? "idle" : "unavailable");
   const [todayKey, setTodayKey] = useState(() => getLocalDateKey());
@@ -56,6 +61,7 @@ function NotesView({ registerBeforeLeave }) {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [hasOpenedHistory, setHasOpenedHistory] = useState(false);
   const textareaRef = useRef(null);
+  const passwordInputRef = useRef(null);
   const isMountedRef = useRef(true);
   const previousTodayRef = useRef(todayKey);
   const lastSavedRef = useRef({ content: "", entryDate: null });
@@ -78,6 +84,10 @@ function NotesView({ registerBeforeLeave }) {
       isMountedRef.current = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (isActive) void ensureClient();
+  }, [ensureClient, isActive]);
 
   useEffect(() => {
     latestDraftRef.current = {
@@ -147,7 +157,7 @@ function NotesView({ registerBeforeLeave }) {
     const queuedWrite = saveQueueRef.current.then(write, write);
     saveQueueRef.current = queuedWrite;
     return queuedWrite;
-  }, []);
+  }, [supabase]);
 
   const flushPendingSave = useCallback(
     ({ quiet = false } = {}) => {
@@ -209,9 +219,20 @@ function NotesView({ registerBeforeLeave }) {
   );
 
   useEffect(() => {
-    if (!registerBeforeLeave) return undefined;
+    if (!isActive || !registerBeforeLeave) return undefined;
     return registerBeforeLeave(() => flushPendingSave());
-  }, [flushPendingSave, registerBeforeLeave]);
+  }, [flushPendingSave, isActive, registerBeforeLeave]);
+
+  useEffect(() => {
+    if (!isActive) return undefined;
+
+    const frame = window.requestAnimationFrame(() => {
+      const focusTarget = user ? textareaRef.current : passwordInputRef.current;
+      focusTarget?.focus({ preventScroll: true });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [isActive, isNoteReady, user]);
 
   useEffect(() => {
     function flushWhenHidden() {
@@ -232,6 +253,26 @@ function NotesView({ registerBeforeLeave }) {
       window.removeEventListener("pagehide", flushBeforePageHide);
     };
   }, [flushPendingSave]);
+
+  useEffect(() => {
+    if (!isActive) return undefined;
+
+    function warnBeforeUnload(event) {
+      const draft = latestDraftRef.current;
+      const hasUnsavedContent =
+        draft.isReady &&
+        draft.userId &&
+        (draft.content !== lastSavedRef.current.content ||
+          draft.entryDate !== lastSavedRef.current.entryDate);
+
+      if (!hasUnsavedContent) return;
+      event.preventDefault();
+      event.returnValue = "";
+    }
+
+    window.addEventListener("beforeunload", warnBeforeUnload);
+    return () => window.removeEventListener("beforeunload", warnBeforeUnload);
+  }, [isActive]);
 
   useEffect(() => {
     if (!userId) {
@@ -278,7 +319,7 @@ function NotesView({ registerBeforeLeave }) {
     return () => {
       isActive = false;
     };
-  }, [entryDate, userId]);
+  }, [entryDate, supabase, userId]);
 
   useEffect(() => {
     if (!supabase || !userId || !isNoteReady || !entryDate) return undefined;
@@ -299,7 +340,7 @@ function NotesView({ registerBeforeLeave }) {
       window.clearTimeout(timer);
       if (saveTimerRef.current === timer) saveTimerRef.current = null;
     };
-  }, [content, entryDate, isNoteReady, persistEntry, userId]);
+  }, [content, entryDate, isNoteReady, persistEntry, supabase, userId]);
 
   useEffect(() => {
     const previousToday = previousTodayRef.current;
@@ -428,14 +469,6 @@ function NotesView({ registerBeforeLeave }) {
 
   const closeHistory = useCallback(() => setIsHistoryOpen(false), []);
 
-  if (!isReady) {
-    return (
-      <section className="notes-gate page-scroll" aria-label="Notes loading">
-        <ConnectionStatus className="notes-gate__status" />
-      </section>
-    );
-  }
-
   if (!user) {
     const authMessage = {
       error: "Unable to unlock",
@@ -447,6 +480,7 @@ function NotesView({ registerBeforeLeave }) {
         <form className="notes-gate__form" onSubmit={requestSignIn}>
           <input
             className="notes-gate__input"
+            ref={passwordInputRef}
             type="password"
             placeholder="Password"
             value={password}
@@ -510,7 +544,6 @@ function NotesView({ registerBeforeLeave }) {
             setSaveStatus("saving");
           }}
           disabled={!isNoteReady}
-          autoFocus
           aria-label={`Notes for ${formatEntryDate(entryDate)}`}
         />
         <div className="notes-editor__meta">

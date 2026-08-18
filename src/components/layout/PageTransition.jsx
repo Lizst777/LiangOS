@@ -1,22 +1,14 @@
-import { motion, useReducedMotion } from "framer-motion";
-
-function PageTransition({ pageKey, children }) {
-  const shouldReduceMotion = useReducedMotion();
-
+function PageTransition({ pageKey, isActive, children }) {
   return (
-    <motion.div
-      key={pageKey}
-      className={`page-content page-content--${pageKey}`}
-      initial={shouldReduceMotion ? false : { opacity: 0.9 }}
-      animate={{ opacity: 1 }}
-      transition={
-        shouldReduceMotion
-          ? { duration: 0 }
-          : { duration: 0.12, ease: [0.22, 1, 0.36, 1] }
-      }
+    <div
+      className={`page-content page-content--${pageKey} ${
+        isActive ? "page-content--active" : "page-content--inactive"
+      }`}
+      aria-hidden={!isActive}
+      inert={!isActive}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 

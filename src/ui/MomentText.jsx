@@ -4,13 +4,12 @@ import {
   getMillisecondsUntilTomorrow,
 } from "../data/dailyQuotes";
 import { useOwnerSession } from "../hooks/useOwnerSession";
-import { supabase } from "../lib/supabase";
 import { getDaypart } from "../utils/daypart";
 
 const MomentArchive = lazy(() => import("./MomentArchive"));
 
 function MomentText({ weather, daypart }) {
-  const { isReady, user } = useOwnerSession();
+  const { client: supabase, isReady, user } = useOwnerSession();
   const [quoteDate, setQuoteDate] = useState(() => new Date());
   const [saveState, setSaveState] = useState("idle");
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
@@ -37,15 +36,26 @@ function MomentText({ weather, daypart }) {
     lastSavedMomentRef.current = null;
     async function checkSavedQuote() {
       try {
-        const { data, error } = await supabase
+        let { data, error } = await supabase
           .from("moment_traces")
-          .select("content")
-          .eq("content", moment)
+          .select("quote_date")
+          .eq("user_id", userId)
+          .eq("quote_date", dailyQuote.dateKey)
           .limit(1)
           .maybeSingle();
 
+        if (isMissingQuoteMetadata(error)) {
+          ({ data, error } = await supabase
+            .from("moment_traces")
+            .select("content")
+            .eq("user_id", userId)
+            .eq("content", moment)
+            .limit(1)
+            .maybeSingle());
+        }
+
         if (!active || error || !data) return;
-        lastSavedMomentRef.current = moment;
+        lastSavedMomentRef.current = dailyQuote.dateKey;
       } catch {
         // Saving remains available when the duplicate check is unavailable.
       }
@@ -56,7 +66,7 @@ function MomentText({ weather, daypart }) {
     return () => {
       active = false;
     };
-  }, [isReady, moment, userId]);
+  }, [dailyQuote.dateKey, isReady, moment, userId, supabase]);
 
   useEffect(() => {
     return () => {
@@ -75,7 +85,7 @@ function MomentText({ weather, daypart }) {
 
   async function saveMoment() {
     if (!user || saveState === "saving") return;
-    if (lastSavedMomentRef.current === moment) {
+    if (lastSavedMomentRef.current === dailyQuote.dateKey) {
       showSaveState("saved");
       return;
     }
@@ -87,21 +97,44 @@ function MomentText({ weather, daypart }) {
     showSaveState("saving");
 
     try {
-      const { error } = await supabase.from("moment_traces").insert({
+      const trace = {
         user_id: user.id,
         content: moment,
         weather_text: weather?.text ?? null,
-        temperature: weather?.temperature ? String(weather.temperature) : null,
+        temperature:
+          weather?.temperature === null || weather?.temperature === undefined
+            ? null
+            : String(weather.temperature),
         location: weather?.location ?? null,
         daypart: daypart ?? getDaypart(),
-      });
+        quote_date: dailyQuote.dateKey,
+        quote_author: dailyQuote.author,
+        quote_source: dailyQuote.source,
+        quote_source_url: dailyQuote.sourceUrl,
+      };
+
+      let { error } = await supabase
+        .from("moment_traces")
+        .upsert(trace, { onConflict: "user_id,quote_date" });
+
+      if (isMissingQuoteMetadata(error)) {
+        const legacyTrace = {
+          user_id: trace.user_id,
+          content: trace.content,
+          weather_text: trace.weather_text,
+          temperature: trace.temperature,
+          location: trace.location,
+          daypart: trace.daypart,
+        };
+        ({ error } = await supabase.from("moment_traces").insert(legacyTrace));
+      }
 
       if (error) {
         showSaveState("error");
         return;
       }
 
-      lastSavedMomentRef.current = moment;
+      lastSavedMomentRef.current = dailyQuote.dateKey;
       setArchiveRefreshKey((value) => value + 1);
       showSaveState("saved");
     } catch {
@@ -174,6 +207,15 @@ function MomentText({ weather, daypart }) {
         </Suspense>
       )}
     </>
+  );
+}
+
+function isMissingQuoteMetadata(error) {
+  if (!error) return false;
+  return (
+    error.code === "42703" ||
+    error.code === "PGRST204" ||
+    /quote_(date|author|source)/i.test(error.message ?? "")
   );
 }
 

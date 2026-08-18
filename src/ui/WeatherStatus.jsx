@@ -56,6 +56,10 @@ async function loadWeather(longitude, latitude, knownLocation = null) {
 
 function WeatherStatus({ onWeatherChange }) {
   const [weather, setWeather] = useState(null);
+  const [locationState, setLocationState] = useState(() =>
+    navigator.geolocation ? "locating" : "unavailable",
+  );
+  const [locationRequest, setLocationRequest] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -67,11 +71,13 @@ function WeatherStatus({ onWeatherChange }) {
     let lastRequestAt = 0;
     let locationKey = null;
     let locationName = null;
+    let hasCommittedWeather = false;
 
     function commitWeather(nextWeather) {
       if (!active || !nextWeather) return;
       setWeather(nextWeather);
       onWeatherChange?.(nextWeather);
+      hasCommittedWeather = true;
     }
 
     async function refreshWeather(position, { force = false } = {}) {
@@ -102,9 +108,13 @@ function WeatherStatus({ onWeatherChange }) {
           locationKey = key;
           locationName = nextWeather.location;
         }
+        setLocationState("ready");
         commitWeather(nextWeather);
       } catch {
         // Keep the last valid weather during temporary location or API failures.
+        if (!hasCommittedWeather && request === latestRequest) {
+          setLocationState("unavailable");
+        }
       } finally {
         if (request === latestRequest) pendingPositionKey = null;
       }
@@ -136,10 +146,19 @@ function WeatherStatus({ onWeatherChange }) {
         return;
       }
 
-      watchId = navigator.geolocation.watchPosition(handlePosition, () => {}, {
-        enableHighAccuracy: false,
-        maximumAge: LOCATION_MAX_AGE_MS,
-      });
+      watchId = navigator.geolocation.watchPosition(
+        handlePosition,
+        (error) => {
+          if (!active) return;
+          setLocationState(error.code === 1 ? "denied" : "unavailable");
+          stopLocationWatch();
+        },
+        {
+          enableHighAccuracy: false,
+          maximumAge: LOCATION_MAX_AGE_MS,
+          timeout: 12_000,
+        },
+      );
     }
 
     function stopLocationWatch() {
@@ -179,9 +198,26 @@ function WeatherStatus({ onWeatherChange }) {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.clearInterval(refreshTimer);
     };
-  }, [onWeatherChange]);
+  }, [locationRequest, onWeatherChange]);
 
-  if (!weather) return null;
+  if (!weather) {
+    if (locationState === "locating") return null;
+
+    return (
+      <div className="weather-status weather-status--permission" aria-live="polite">
+        <button
+          className="weather-status__permission"
+          type="button"
+          onClick={() => {
+            setLocationState("locating");
+            setLocationRequest((value) => value + 1);
+          }}
+        >
+          定位未开启
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="weather-status" aria-label="Weather">

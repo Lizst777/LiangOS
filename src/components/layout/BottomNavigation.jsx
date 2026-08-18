@@ -1,17 +1,12 @@
-import { motion } from "framer-motion";
 import { NAV_ITEMS } from "../../constants/navigation";
 import { NavIcon } from "../../ui/Icons";
-import { motionTransition } from "../../utils/motion";
 
 function BottomNavigation({ page, onPageChange }) {
   const destination = NAV_ITEMS.find((item) => item.id !== page) ?? NAV_ITEMS[0];
 
   return (
-    <motion.nav
+    <nav
       className={`bottom-nav bottom-nav--${page}`}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={motionTransition}
       aria-label="Workspace navigation"
     >
       <div className="bottom-nav__container">
@@ -29,7 +24,7 @@ function BottomNavigation({ page, onPageChange }) {
           </span>
         </button>
       </div>
-    </motion.nav>
+    </nav>
   );
 }
 

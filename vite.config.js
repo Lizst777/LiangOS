@@ -20,16 +20,6 @@ export default defineConfig({
               test: /node_modules[\\/](framer-motion|motion-dom|motion-utils)[\\/]/,
               priority: 30,
             },
-            {
-              name: "gsap",
-              test: /node_modules[\\/]gsap[\\/]/,
-              priority: 20,
-            },
-            {
-              name: "supabase",
-              test: /node_modules[\\/]@supabase[\\/]/,
-              priority: 20,
-            },
           ],
         },
       },

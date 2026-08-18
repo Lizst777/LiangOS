@@ -57,12 +57,23 @@ function MomentArchive({ isOpen, onClose, refreshKey }) {
     async function loadTraces() {
       setLoadState("loading");
 
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from("moment_traces")
-        .select("id, content, weather_text, temperature, location, created_at")
+        .select(
+          "id, content, weather_text, temperature, location, created_at, quote_date, quote_author, quote_source, quote_source_url",
+        )
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(120);
+
+      if (isMissingQuoteMetadata(error)) {
+        ({ data, error } = await supabase
+          .from("moment_traces")
+          .select("id, content, weather_text, temperature, location, created_at")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false })
+          .limit(120));
+      }
 
       if (!isActive) return;
 
@@ -281,6 +292,13 @@ function MomentArchive({ isOpen, onClose, refreshKey }) {
                       <p>{trace.content}</p>
                     )}
 
+                    {(trace.quote_author || trace.quote_source) && (
+                      <span className="moment-trace__source">
+                        {[trace.quote_author, trace.quote_source]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </span>
+                    )}
                     <span className="moment-trace__weather">{weather}</span>
 
                     <div className="moment-trace__actions" aria-live="polite">
@@ -341,6 +359,15 @@ function MomentArchive({ isOpen, onClose, refreshKey }) {
       )}
     </AnimatePresence>,
     document.querySelector(".liangos-app") ?? document.body,
+  );
+}
+
+function isMissingQuoteMetadata(error) {
+  if (!error) return false;
+  return (
+    error.code === "42703" ||
+    error.code === "PGRST204" ||
+    /quote_(date|author|source)/i.test(error.message ?? "")
   );
 }
 

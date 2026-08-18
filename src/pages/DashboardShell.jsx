@@ -19,27 +19,15 @@ function DashboardShell({
   registerBeforePageChange,
 }) {
   useEffect(() => {
-    void loadNotesView().catch(() => {});
-  }, []);
+    const preloadNotes = () => void loadNotesView();
+    const idleId = window.requestIdleCallback?.(preloadNotes, { timeout: 1600 });
+    const timeoutId = idleId === undefined ? window.setTimeout(preloadNotes, 900) : null;
 
-  function renderView() {
-    switch (currentPage) {
-      case "notes":
-        return (
-          <Suspense
-            fallback={
-              <section className="page-loading" aria-label="Notes loading">
-                <ConnectionStatus />
-              </section>
-            }
-          >
-            <NotesView registerBeforeLeave={registerBeforePageChange} />
-          </Suspense>
-        );
-      default:
-        return <DashboardView />;
-    }
-  }
+    return () => {
+      if (idleId !== undefined) window.cancelIdleCallback?.(idleId);
+      if (timeoutId !== null) window.clearTimeout(timeoutId);
+    };
+  }, []);
 
   return (
     <section className={`app-shell app-shell--${currentPage}`}>
@@ -53,7 +41,23 @@ function DashboardShell({
       <main className={`main main--${currentPage}`}>
         <MobileHeader page={currentPage} theme={theme} onThemeToggle={onThemeToggle} />
         <PageHeader page={currentPage} />
-        <PageTransition pageKey={currentPage}>{renderView()}</PageTransition>
+        <PageTransition pageKey="dashboard" isActive={currentPage === "dashboard"}>
+          <DashboardView />
+        </PageTransition>
+        <PageTransition pageKey="notes" isActive={currentPage === "notes"}>
+          <Suspense
+            fallback={
+              <section className="page-loading" aria-label="Notes loading">
+                <ConnectionStatus />
+              </section>
+            }
+          >
+            <NotesView
+              isActive={currentPage === "notes"}
+              registerBeforeLeave={registerBeforePageChange}
+            />
+          </Suspense>
+        </PageTransition>
       </main>
       <BottomNavigation page={currentPage} onPageChange={onPageChange} />
     </section>

@@ -11,6 +11,35 @@ function getLocalDateKey(value) {
   return `${year}-${month}-${day}`;
 }
 
+async function loadMomentTraces(supabase, userId) {
+  let result = await supabase
+    .from("moment_traces")
+    .select(
+      "content, weather_text, temperature, location, daypart, created_at, quote_date, quote_author, quote_source, quote_source_url",
+    )
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (isMissingQuoteMetadata(result.error)) {
+    result = await supabase
+      .from("moment_traces")
+      .select("content, weather_text, temperature, location, daypart, created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+  }
+
+  return result;
+}
+
+function isMissingQuoteMetadata(error) {
+  if (!error) return false;
+  return (
+    error.code === "42703" ||
+    error.code === "PGRST204" ||
+    /quote_(date|author|source)/i.test(error.message ?? "")
+  );
+}
+
 export async function exportPrivateData(supabase, userId) {
   const [notesResult, tracesResult, versionsResult, legacyNoteResult] = await Promise.all([
     supabase
@@ -18,13 +47,7 @@ export async function exportPrivateData(supabase, userId) {
       .select("content, entry_date, created_at, updated_at")
       .eq("user_id", userId)
       .order("entry_date", { ascending: false }),
-    supabase
-      .from("moment_traces")
-      .select(
-        "content, weather_text, temperature, location, daypart, created_at",
-      )
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false }),
+    loadMomentTraces(supabase, userId),
     supabase
       .from("daily_note_versions")
       .select("content, entry_date, created_at")
@@ -57,12 +80,16 @@ export async function exportPrivateData(supabase, userId) {
       temperature: trace.temperature,
       location: trace.location,
       daypart: trace.daypart,
+      quote_date: trace.quote_date ?? null,
+      quote_author: trace.quote_author ?? null,
+      quote_source: trace.quote_source ?? null,
+      quote_source_url: trace.quote_source_url ?? null,
     })),
   ].sort((left, right) => new Date(right.occurred_at) - new Date(left.occurred_at));
 
   const payload = {
     schema: "liangos.private-data",
-    version: 2,
+    version: 3,
     exported_at: new Date().toISOString(),
     timeline,
     daily_notes: dailyNotes,
