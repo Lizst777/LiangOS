@@ -16,8 +16,7 @@ export function getDailyQuote(date = new Date()) {
   );
   const epochDayNumber = Math.floor(QUOTE_EPOCH_UTC / DAY_MS);
   const quoteIndex =
-    ((dayNumber - epochDayNumber) % DAILY_QUOTES.length +
-      DAILY_QUOTES.length) %
+    (((dayNumber - epochDayNumber) % DAILY_QUOTES.length) + DAILY_QUOTES.length) %
     DAILY_QUOTES.length;
   const quote = DAILY_QUOTES[quoteIndex];
 
@@ -28,11 +27,7 @@ export function getDailyQuote(date = new Date()) {
 }
 
 export function getMillisecondsUntilTomorrow(date = new Date()) {
-  const tomorrow = new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate() + 1,
-  );
+  const tomorrow = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
   return Math.max(1000, tomorrow.getTime() - date.getTime() + 100);
 }
 

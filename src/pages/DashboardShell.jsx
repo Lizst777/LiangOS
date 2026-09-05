@@ -13,7 +13,6 @@ const NotesView = lazy(loadNotesView);
 function DashboardShell({
   currentPage,
   theme,
-  resolvedTheme,
   onThemeToggle,
   onPageChange,
   registerBeforePageChange,
@@ -21,7 +20,8 @@ function DashboardShell({
   useEffect(() => {
     const preloadNotes = () => void loadNotesView();
     const idleId = window.requestIdleCallback?.(preloadNotes, { timeout: 1600 });
-    const timeoutId = idleId === undefined ? window.setTimeout(preloadNotes, 900) : null;
+    const timeoutId =
+      idleId === undefined ? window.setTimeout(preloadNotes, 900) : null;
 
     return () => {
       if (idleId !== undefined) window.cancelIdleCallback?.(idleId);
@@ -34,7 +34,6 @@ function DashboardShell({
       <Sidebar
         page={currentPage}
         theme={theme}
-        resolvedTheme={resolvedTheme}
         onPageChange={onPageChange}
         onThemeToggle={onThemeToggle}
       />

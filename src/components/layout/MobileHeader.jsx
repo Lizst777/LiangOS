@@ -1,12 +1,6 @@
 import { getPageMeta } from "../../constants/navigation";
+import ThemeIcon from "../../ui/ThemeIcon";
 import { getThemeLabel } from "../../utils/theme";
-import { IconMonitor, IconMoon, IconSun } from "../../ui/Icons";
-
-function ThemeIcon({ theme }) {
-  if (theme === "light") return <IconSun />;
-  if (theme === "dark") return <IconMoon />;
-  return <IconMonitor />;
-}
 
 function MobileHeader({ page, theme, onThemeToggle }) {
   const meta = getPageMeta(page);

@@ -17,7 +17,7 @@
   --panel-bg: #18181c;
   --panel-bg-raised: #1e1e22;
   --panel-bg-solid: #141417;
-  --panel-border: rgba(255, 255, 255, 0.10);
+  --panel-border: rgba(255, 255, 255, 0.1);
   --panel-border-soft: rgba(255, 255, 255, 0.06);
   --text-main: #f0f2f5;
   --text-muted: #9ca3af;
@@ -57,23 +57,23 @@
   --sidebar-width: 200px;
   --sidebar-collapsed: 60px;
 
-    --os-body: var(--app-bg);
+  --os-body: var(--app-bg);
   --os-text: var(--text-main);
   --os-text-secondary: #3f4557;
   --os-muted: var(--text-muted);
   --os-muted-paragraph: var(--text-soft);
   --os-border: var(--panel-border);
   --os-border-subtle: var(--panel-border-soft);
-  --os-border-input: rgba(0, 0, 0, 0.10);
+  --os-border-input: rgba(0, 0, 0, 0.1);
   --os-surface: var(--panel-bg);
   --os-surface-raised: var(--panel-bg-raised);
   --os-surface-solid: var(--panel-bg-solid);
   --os-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
   --os-shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.05);
   --os-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --os-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.10);
+  --os-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
   --os-blur: blur(0px);
-    --os-dash-bg: var(--app-bg);
+  --os-dash-bg: var(--app-bg);
   --os-sidebar-bg: #ecedf1;
   --os-sidebar-divider: rgba(0, 0, 0, 0.08);
   --os-nav-hover: rgba(0, 0, 0, 0.04);

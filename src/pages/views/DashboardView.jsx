@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
+import WeatherStatus from "../../features/weather/WeatherStatus";
 import TimeDisplay from "../../ui/TimeDisplay";
-import WeatherStatus from "../../ui/WeatherStatus";
 import { getDaypart } from "../../utils/daypart";
 
 const SOFT_WEATHER = /rain|fog|haze|overcast|snow|shower|thunder/i;

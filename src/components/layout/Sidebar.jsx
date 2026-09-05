@@ -1,15 +1,10 @@
-import { NAV_ITEMS } from "../../constants/navigation";
-import { IconMoon, IconSun, IconMonitor, NavIcon } from "../../ui/Icons";
+import { getNavigationDestination } from "../../constants/navigation";
+import { NavIcon } from "../../ui/Icons";
+import ThemeIcon from "../../ui/ThemeIcon";
 import { getThemeLabel } from "../../utils/theme";
 
-function ThemeIcon({ theme }) {
-  if (theme === "light") return <IconSun />;
-  if (theme === "dark") return <IconMoon />;
-  return <IconMonitor />;
-}
-
 function Sidebar({ page, theme, onPageChange, onThemeToggle }) {
-  const destination = NAV_ITEMS.find((item) => item.id !== page) ?? NAV_ITEMS[0];
+  const destination = getNavigationDestination(page);
   const themeLabel = getThemeLabel(theme);
 
   return (

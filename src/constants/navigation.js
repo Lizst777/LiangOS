@@ -17,3 +17,7 @@ export const PAGE_META = {
 export function getPageMeta(pageId) {
   return PAGE_META[pageId] ?? PAGE_META.dashboard;
 }
+
+export function getNavigationDestination(pageId) {
+  return NAV_ITEMS.find((item) => item.id !== pageId) ?? NAV_ITEMS[0];
+}

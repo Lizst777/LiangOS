@@ -1,18 +1,13 @@
-function throwIfError(result) {
+import { isMissingQuoteMetadata } from "../moments/momentTraceRepository";
+import { getLocalDateKey } from "../notes/date";
+
+function unwrap(result) {
   if (result.error) throw result.error;
   return result.data;
 }
 
-function getLocalDateKey(value) {
-  const date = new Date(value);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-async function loadMomentTraces(supabase, userId) {
-  let result = await supabase
+async function loadMomentTraces(client, userId) {
+  let result = await client
     .from("moment_traces")
     .select(
       "content, weather_text, temperature, location, daypart, created_at, quote_date, quote_author, quote_source, quote_source_url",
@@ -21,7 +16,7 @@ async function loadMomentTraces(supabase, userId) {
     .order("created_at", { ascending: false });
 
   if (isMissingQuoteMetadata(result.error)) {
-    result = await supabase
+    result = await client
       .from("moment_traces")
       .select("content, weather_text, temperature, location, daypart, created_at")
       .eq("user_id", userId)
@@ -31,40 +26,36 @@ async function loadMomentTraces(supabase, userId) {
   return result;
 }
 
-function isMissingQuoteMetadata(error) {
-  if (!error) return false;
-  return (
-    error.code === "42703" ||
-    error.code === "PGRST204" ||
-    /quote_(date|author|source)/i.test(error.message ?? "")
-  );
-}
-
-export async function exportPrivateData(supabase, userId) {
-  const [notesResult, tracesResult, versionsResult, legacyNoteResult] = await Promise.all([
-    supabase
+async function loadPrivateData(client, userId) {
+  const [notes, traces, versions, legacyNote] = await Promise.all([
+    client
       .from("daily_notes")
       .select("content, entry_date, created_at, updated_at")
       .eq("user_id", userId)
       .order("entry_date", { ascending: false }),
-    loadMomentTraces(supabase, userId),
-    supabase
+    loadMomentTraces(client, userId),
+    client
       .from("daily_note_versions")
       .select("content, entry_date, created_at")
       .eq("user_id", userId)
       .order("created_at", { ascending: false }),
-    supabase
+    client
       .from("notes")
       .select("content, last_entry_date, updated_at")
       .eq("user_id", userId)
       .maybeSingle(),
   ]);
 
-  const dailyNotes = throwIfError(notesResult) ?? [];
-  const momentTraces = throwIfError(tracesResult) ?? [];
-  const dailyNoteVersions = throwIfError(versionsResult) ?? [];
-  const legacyNote = throwIfError(legacyNoteResult);
-  const timeline = [
+  return {
+    dailyNotes: unwrap(notes) ?? [],
+    dailyNoteVersions: unwrap(versions) ?? [],
+    legacyNote: unwrap(legacyNote),
+    momentTraces: unwrap(traces) ?? [],
+  };
+}
+
+function createTimeline(dailyNotes, momentTraces) {
+  return [
     ...dailyNotes.map((note) => ({
       type: "note",
       occurred_at: note.updated_at,
@@ -86,18 +77,9 @@ export async function exportPrivateData(supabase, userId) {
       quote_source_url: trace.quote_source_url ?? null,
     })),
   ].sort((left, right) => new Date(right.occurred_at) - new Date(left.occurred_at));
+}
 
-  const payload = {
-    schema: "liangos.private-data",
-    version: 3,
-    exported_at: new Date().toISOString(),
-    timeline,
-    daily_notes: dailyNotes,
-    moment_traces: momentTraces,
-    daily_note_versions: dailyNoteVersions,
-    legacy_note: legacyNote,
-  };
-
+function downloadJson(payload) {
   const blob = new Blob([`${JSON.stringify(payload, null, 2)}\n`], {
     type: "application/json;charset=utf-8",
   });
@@ -112,4 +94,20 @@ export async function exportPrivateData(supabase, userId) {
   anchor.click();
   anchor.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+export async function exportPrivateData(client, userId) {
+  const { dailyNotes, dailyNoteVersions, legacyNote, momentTraces } =
+    await loadPrivateData(client, userId);
+
+  downloadJson({
+    schema: "liangos.private-data",
+    version: 3,
+    exported_at: new Date().toISOString(),
+    timeline: createTimeline(dailyNotes, momentTraces),
+    daily_notes: dailyNotes,
+    moment_traces: momentTraces,
+    daily_note_versions: dailyNoteVersions,
+    legacy_note: legacyNote,
+  });
 }

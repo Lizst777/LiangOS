@@ -1,21 +1,17 @@
-import { NAV_ITEMS } from "../../constants/navigation";
+import { getNavigationDestination } from "../../constants/navigation";
 import { NavIcon } from "../../ui/Icons";
 
-const LIQUID_DOCK_FILTER =
-  "blur(20px) saturate(165%) brightness(112%)";
+const LIQUID_DOCK_FILTER = "blur(20px) saturate(165%) brightness(112%)";
 const LIQUID_DOCK_STYLE = {
   backdropFilter: LIQUID_DOCK_FILTER,
   WebkitBackdropFilter: LIQUID_DOCK_FILTER,
 };
 
 function BottomNavigation({ page, onPageChange }) {
-  const destination = NAV_ITEMS.find((item) => item.id !== page) ?? NAV_ITEMS[0];
+  const destination = getNavigationDestination(page);
 
   return (
-    <nav
-      className={`bottom-nav bottom-nav--${page}`}
-      aria-label="Workspace navigation"
-    >
+    <nav className={`bottom-nav bottom-nav--${page}`} aria-label="Workspace navigation">
       <div className="bottom-nav__container" style={LIQUID_DOCK_STYLE}>
         <button
           type="button"

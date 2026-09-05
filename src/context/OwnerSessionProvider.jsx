@@ -1,29 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  hasSupabaseConfig,
+  restoreOwnerSession,
+  signInOwner,
+} from "../features/auth/ownerAuth";
 import { OwnerSessionContext } from "./ownerSessionContext";
-
-const OWNER_EMAIL = "notes-owner@liangos.local";
-const HAS_SUPABASE_CONFIG = Boolean(
-  import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY,
-);
-const SESSION_RESTORE_TIMEOUT = 8000;
-const SIGN_IN_TIMEOUT = 12000;
-
-function withTimeout(promise, timeout, message) {
-  let timeoutId;
-  const timeoutPromise = new Promise((_, reject) => {
-    timeoutId = window.setTimeout(() => reject(new Error(message)), timeout);
-  });
-
-  return Promise.race([promise, timeoutPromise]).finally(() => {
-    window.clearTimeout(timeoutId);
-  });
-}
 
 function OwnerSessionProvider({ children }) {
   const [client, setClient] = useState(null);
   const [session, setSession] = useState(null);
-  const [isAvailable, setIsAvailable] = useState(HAS_SUPABASE_CONFIG);
-  const [isReady, setIsReady] = useState(!HAS_SUPABASE_CONFIG);
+  const [isAvailable, setIsAvailable] = useState(hasSupabaseConfig);
+  const [isReady, setIsReady] = useState(!hasSupabaseConfig);
   const clientRef = useRef(null);
   const loadPromiseRef = useRef(null);
   const subscriptionRef = useRef(null);
@@ -32,7 +19,7 @@ function OwnerSessionProvider({ children }) {
   const ensureClient = useCallback(async () => {
     if (clientRef.current) return clientRef.current;
     if (loadPromiseRef.current) return loadPromiseRef.current;
-    if (!HAS_SUPABASE_CONFIG) return null;
+    if (!hasSupabaseConfig) return null;
 
     setIsReady(false);
     loadPromiseRef.current = (async () => {
@@ -58,11 +45,7 @@ function OwnerSessionProvider({ children }) {
         }
 
         try {
-          const { data, error } = await withTimeout(
-            supabase.auth.getSession(),
-            SESSION_RESTORE_TIMEOUT,
-            "Session restore timed out.",
-          );
+          const { data, error } = await restoreOwnerSession(supabase);
           if (error) {
             void supabase.auth.signOut({ scope: "local" }).catch(() => undefined);
           }
@@ -89,11 +72,12 @@ function OwnerSessionProvider({ children }) {
 
   useEffect(() => {
     isMountedRef.current = true;
-    if (!HAS_SUPABASE_CONFIG) return undefined;
+    if (!hasSupabaseConfig) return undefined;
 
     const beginRestore = () => void ensureClient();
     const idleId = window.requestIdleCallback?.(beginRestore, { timeout: 2200 });
-    const timeoutId = idleId === undefined ? window.setTimeout(beginRestore, 900) : null;
+    const timeoutId =
+      idleId === undefined ? window.setTimeout(beginRestore, 900) : null;
 
     return () => {
       isMountedRef.current = false;
@@ -104,25 +88,21 @@ function OwnerSessionProvider({ children }) {
     };
   }, [ensureClient]);
 
-  const signIn = useCallback(async (password) => {
-    const supabase = await ensureClient();
-    if (!supabase) return { error: new Error("Supabase is unavailable.") };
+  const signIn = useCallback(
+    async (password) => {
+      const supabase = await ensureClient();
+      if (!supabase) return { error: new Error("Supabase is unavailable.") };
 
-    try {
-      return await withTimeout(
-        supabase.auth.signInWithPassword({
-          email: OWNER_EMAIL,
-          password,
-        }),
-        SIGN_IN_TIMEOUT,
-        "Sign in timed out.",
-      );
-    } catch (error) {
-      return {
-        error: error instanceof Error ? error : new Error("Unable to sign in."),
-      };
-    }
-  }, [ensureClient]);
+      try {
+        return await signInOwner(supabase, password);
+      } catch (error) {
+        return {
+          error: error instanceof Error ? error : new Error("Unable to sign in."),
+        };
+      }
+    },
+    [ensureClient],
+  );
 
   const signOut = useCallback(async () => {
     const supabase = clientRef.current;
@@ -144,7 +124,11 @@ function OwnerSessionProvider({ children }) {
     [client, ensureClient, isAvailable, isReady, session, signIn, signOut],
   );
 
-  return <OwnerSessionContext.Provider value={value}>{children}</OwnerSessionContext.Provider>;
+  return (
+    <OwnerSessionContext.Provider value={value}>
+      {children}
+    </OwnerSessionContext.Provider>
+  );
 }
 
 export default OwnerSessionProvider;

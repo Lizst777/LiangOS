@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import MomentText from "./MomentText";
+import MomentText from "../features/moments/MomentText";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "long",

@@ -21,12 +21,31 @@ publishable key here. Never use a secret or `service_role` key in the frontend.
 ## Verification
 
 ```powershell
+npm.cmd run format:check
 npm.cmd run lint
+npm.cmd test
 npm.cmd run build
+npm.cmd audit
 ```
 
 The production build is written to `dist/`. Netlify uses the build and publish
 settings in `netlify.toml`.
+
+## Source structure
+
+- `src/pages`: page-level composition only.
+- `src/features`: domain UI, lifecycle hooks, and data repositories grouped by
+  capability.
+- `src/components/layout`: shared page shell and navigation.
+- `src/ui`: small reusable presentation components and icons.
+- `src/hooks`: application-wide hooks such as navigation, theme, and focus.
+- `src/styles`: styles split by responsibility while preserving one explicit
+  import order in `src/styles/index.css`.
+- `src/data`: generated quote corpus and its deterministic daily selector.
+
+Run `npm.cmd run format` after changing JavaScript, JSX, CSS, JSON, Markdown, or
+HTML. Generated quote data and immutable database migrations are intentionally
+excluded from automatic formatting.
 
 ## Data model
 

@@ -12,16 +12,12 @@ const OUTPUT_PATH = resolve(
 
 const SOURCES = {
   tang: {
-    dataUrl:
-      `https://raw.githubusercontent.com/chinese-poetry/chinese-poetry/${DATASET_REVISION}/%E6%B0%B4%E5%A2%A8%E5%94%90%E8%AF%97/shuimotangshi.json`,
-    pageUrl:
-      `https://github.com/chinese-poetry/chinese-poetry/blob/${DATASET_REVISION}/%E6%B0%B4%E5%A2%A8%E5%94%90%E8%AF%97/shuimotangshi.json`,
+    dataUrl: `https://raw.githubusercontent.com/chinese-poetry/chinese-poetry/${DATASET_REVISION}/%E6%B0%B4%E5%A2%A8%E5%94%90%E8%AF%97/shuimotangshi.json`,
+    pageUrl: `https://github.com/chinese-poetry/chinese-poetry/blob/${DATASET_REVISION}/%E6%B0%B4%E5%A2%A8%E5%94%90%E8%AF%97/shuimotangshi.json`,
   },
   youmengying: {
-    dataUrl:
-      `https://raw.githubusercontent.com/chinese-poetry/chinese-poetry/${DATASET_REVISION}/%E5%B9%BD%E6%A2%A6%E5%BD%B1/youmengying.json`,
-    pageUrl:
-      `https://github.com/chinese-poetry/chinese-poetry/blob/${DATASET_REVISION}/%E5%B9%BD%E6%A2%A6%E5%BD%B1/youmengying.json`,
+    dataUrl: `https://raw.githubusercontent.com/chinese-poetry/chinese-poetry/${DATASET_REVISION}/%E5%B9%BD%E6%A2%A6%E5%BD%B1/youmengying.json`,
+    pageUrl: `https://github.com/chinese-poetry/chinese-poetry/blob/${DATASET_REVISION}/%E5%B9%BD%E6%A2%A6%E5%BD%B1/youmengying.json`,
   },
 };
 
@@ -64,9 +60,9 @@ const KNOWN_TANG_AUTHORS = new Set(
     " ",
   ),
 );
-const CALM_CHARACTERS = new Set(
-  [..."山水云月风雨雪花草春秋夜江舟松竹梅茶酒书梦闲静心归远明天地人生光影鸟泉石"],
-);
+const CALM_CHARACTERS = new Set([
+  ..."山水云月风雨雪花草春秋夜江舟松竹梅茶酒书梦闲静心归远明天地人生光影鸟泉石",
+]);
 const UNSUITABLE_CONTENT =
   /杀|死|尸|血|兵|军|战|戍|征|虏|胡|帝|王宫|妓|妾|娼|青楼|楚腰|商女|赌|刑|狱|奸|盗|贼|瘟疫|疾病|饥|贫|丧|葬|棺|墓|亡国|后庭花|卖炭|衣裳口中食|轻生|折戟|铜雀|辕门|红旗|弓刀|烽火|单于|可怜|泪|哭|恨|怨/;
 const UNSUITABLE_TITLES =
@@ -74,9 +70,9 @@ const UNSUITABLE_TITLES =
 const UNSUITABLE_APHORISM =
   /杀|死|尸|血|兵|军|战|戍|征|虏|胡|帝|王宫|妓|妾|娼|赌|刑|狱|奸|盗|贼|瘟疫|疾病|饥|贫|丧|葬|棺|墓|小人|君子|圣人|仙佛|和尚|妻妾|妇女|美人|佳人|神童|名臣|富贵|金瓶梅/;
 const APHORISM_INDICES = new Set([
-  0, 1, 2, 4, 5, 7, 9, 11, 13, 14, 15, 17, 18, 19, 20, 21, 23, 27, 28, 29,
-  30, 31, 32, 33, 34, 35, 36, 38, 39, 43, 44, 46, 48, 49, 50, 52, 55, 56, 57,
-  59, 60, 65, 67, 69, 74, 75, 78, 84,
+  0, 1, 2, 4, 5, 7, 9, 11, 13, 14, 15, 17, 18, 19, 20, 21, 23, 27, 28, 29, 30, 31, 32,
+  33, 34, 35, 36, 38, 39, 43, 44, 46, 48, 49, 50, 52, 55, 56, 57, 59, 60, 65, 67, 69,
+  74, 75, 78, 84,
 ]);
 const SOURCE_CORRECTIONS = new Map([
   ["远目寒山石径斜，白云生处有人家。", "远上寒山石径斜，白云生处有人家。"],
@@ -203,7 +199,9 @@ async function main() {
   );
 
   if (quotes.length !== TARGET_QUOTE_COUNT) {
-    throw new Error(`Expected ${TARGET_QUOTE_COUNT} quotes, generated ${quotes.length}.`);
+    throw new Error(
+      `Expected ${TARGET_QUOTE_COUNT} quotes, generated ${quotes.length}.`,
+    );
   }
 
   await mkdir(dirname(OUTPUT_PATH), { recursive: true });
