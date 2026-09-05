@@ -31,6 +31,13 @@ npm.cmd audit
 The production build is written to `dist/`. Netlify uses the build and publish
 settings in `netlify.toml`.
 
+Production JavaScript and CSS intentionally retain indentation and line breaks
+(`build.minify: false` and `build.cssMinify: false`). Open the asset URLs linked
+from the current homepage to inspect readable output; old hashed asset URLs still
+refer to earlier builds. Bundling and lazy loading remain enabled.
+JSON imports expand into readable objects. Vite emits formatted bundles and
+calculates their content hashes as part of the same build.
+
 ## Source structure
 
 - `src/pages`: page-level composition only.

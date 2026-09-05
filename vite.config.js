@@ -5,7 +5,12 @@ import tailwindcss from "@tailwindcss/vite";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  // Expand quote data instead of emitting a single long JSON.parse string.
+  json: { stringify: false },
   build: {
+    // Keep deployed assets readable when opened directly in the browser.
+    minify: false,
+    cssMinify: false,
     rolldownOptions: {
       output: {
         codeSplitting: {
