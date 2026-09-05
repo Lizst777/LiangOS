@@ -1,9 +1,6 @@
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
-import { useDialogFocus } from "../../hooks/useDialogFocus";
+import { useEffect, useState } from "react";
+import PrivateDialog from "../../components/layout/PrivateDialog";
 import { useOwnerSession } from "../../hooks/useOwnerSession";
-import { IconClose } from "../../ui/Icons";
 import TimelineItem from "./TimelineItem";
 import { isCurrentTimelineItem } from "./timeline";
 import { loadTimeline } from "./timelineRepository";
@@ -27,9 +24,6 @@ function NoteHistory({
   const [loadState, setLoadState] = useState("idle");
   const [pendingId, setPendingId] = useState(null);
   const [errorId, setErrorId] = useState(null);
-  const dialogRef = useRef(null);
-
-  useDialogFocus(isOpen, dialogRef);
 
   useEffect(() => {
     if (!isOpen || !client || !userId) return undefined;
@@ -58,24 +52,6 @@ function NoteHistory({
       isActive = false;
     };
   }, [client, isOpen, userId]);
-
-  useEffect(() => {
-    if (!isOpen) return undefined;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    function closeOnEscape(event) {
-      if (event.key === "Escape" && pendingId === null) onClose();
-    }
-
-    window.addEventListener("keydown", closeOnEscape);
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", closeOnEscape);
-    };
-  }, [isOpen, onClose, pendingId]);
 
   async function selectItem(item) {
     if (pendingId !== null) return;
@@ -107,71 +83,37 @@ function NoteHistory({
     }
   }
 
-  if (typeof document === "undefined") return null;
-
   const showEmptyMessage =
     loadState === "error" ||
     (loadState === "loading" && items.length === 0) ||
     (loadState === "ready" && items.length === 0);
 
-  return createPortal(
-    <AnimatePresence>
-      {isOpen && (
-        <motion.section
-          className="note-history"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="note-history-title"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <motion.div
-            className="note-history__inner"
-            ref={dialogRef}
-            tabIndex={-1}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 6 }}
-            transition={{ duration: 0.24 }}
-          >
-            <header className="note-history__header">
-              <h2 id="note-history-title">Timeline</h2>
-              <button
-                className="note-history__close"
-                type="button"
-                onClick={onClose}
-                disabled={pendingId !== null}
-                aria-label="Close timeline"
-                title="Close"
-                data-dialog-initial-focus
-              >
-                <IconClose />
-              </button>
-            </header>
+  return (
+    <PrivateDialog
+      className="note-history"
+      title="Timeline"
+      closeLabel="Close timeline"
+      isOpen={isOpen}
+      onClose={onClose}
+      closeDisabled={pendingId !== null}
+    >
+      <div className="note-history__list">
+        {showEmptyMessage && (
+          <p className="note-history__empty">{EMPTY_MESSAGES[loadState]}</p>
+        )}
 
-            <div className="note-history__list">
-              {showEmptyMessage && (
-                <p className="note-history__empty">{EMPTY_MESSAGES[loadState]}</p>
-              )}
-
-              {items.map((item) => (
-                <TimelineItem
-                  currentEntry={currentEntry}
-                  errorId={errorId}
-                  item={item}
-                  key={item.key}
-                  onSelect={selectItem}
-                  pendingId={pendingId}
-                />
-              ))}
-            </div>
-          </motion.div>
-        </motion.section>
-      )}
-    </AnimatePresence>,
-    document.querySelector(".liangos-app") ?? document.body,
+        {items.map((item) => (
+          <TimelineItem
+            currentEntry={currentEntry}
+            errorId={errorId}
+            item={item}
+            key={item.key}
+            onSelect={selectItem}
+            pendingId={pendingId}
+          />
+        ))}
+      </div>
+    </PrivateDialog>
   );
 }
 

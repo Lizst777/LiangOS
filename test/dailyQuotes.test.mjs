@@ -3,9 +3,9 @@ import assert from "node:assert/strict";
 import {
   DAILY_QUOTES,
   getDailyQuote,
-  getLocalDateKey,
   getMillisecondsUntilTomorrow,
 } from "../src/data/dailyQuotes.js";
+import { getLocalDateKey } from "../src/utils/date.js";
 
 test("the local quote corpus covers a leap year without duplicate text", () => {
   assert.equal(DAILY_QUOTES.length, 366);

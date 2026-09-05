@@ -89,10 +89,6 @@
   color: rgba(255, 255, 255, 0.82);
 }
 
-.app-shell--dashboard .sidebar__item--active {
-  color: rgba(255, 255, 255, 0.95);
-}
-
 .app-shell--dashboard .sidebar__action {
   color: rgba(255, 255, 255, 0.58);
 }
@@ -126,8 +122,7 @@
   color: rgba(255, 255, 255, 0.54);
 }
 
-.app-shell--dashboard .bottom-nav__item:hover,
-.app-shell--dashboard .bottom-nav__item--active {
+.app-shell--dashboard .bottom-nav__item:hover {
   color: rgba(255, 255, 255, 0.94);
 }
 

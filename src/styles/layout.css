@@ -24,37 +24,6 @@
   overflow: visible;
 }
 
-.sidebar__brand {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: 0 var(--space-1);
-  margin-bottom: var(--space-8);
-}
-
-.sidebar__logo-mark {
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-md);
-  background: var(--os-nav-active-bg);
-  color: var(--os-nav-active-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-sm);
-  font-weight: 650;
-  letter-spacing: 0;
-}
-
-.sidebar__logo-text {
-  font-size: var(--font-lg);
-  font-weight: 650;
-  letter-spacing: 0;
-  color: var(--os-text);
-  white-space: nowrap;
-}
-
 .sidebar__nav {
   display: flex;
   flex-direction: column;
@@ -94,26 +63,6 @@
   background: transparent;
   opacity: 0.9;
   transform: translateY(-1px);
-}
-
-.sidebar__item--active {
-  background: transparent;
-  color: var(--os-text);
-  font-weight: 500;
-  opacity: 1;
-}
-
-.sidebar__item--active::before {
-  content: "";
-  position: absolute;
-  left: -0.85rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 3px;
-  border-radius: 2px;
-  background: currentColor;
-  opacity: 0.72;
 }
 
 .sidebar__item-icon {
@@ -172,10 +121,6 @@
 .sidebar__item-icon svg {
   width: 17px;
   height: 17px;
-}
-
-.sidebar__item--active .sidebar__item-icon {
-  opacity: 1;
 }
 
 .sidebar__footer {
@@ -242,32 +187,6 @@
   display: none;
 }
 
-.page-header {
-  display: none;
-  width: fit-content;
-  margin: 0 0 var(--space-8) auto;
-  padding: 0;
-  border-bottom: 0;
-  opacity: 0.52;
-}
-
-.page-header h1 {
-  font-size: 0.72rem;
-  font-weight: 520;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--os-muted);
-  margin-bottom: 0;
-}
-
-.page-header__desc {
-  display: none;
-  color: var(--os-muted-paragraph);
-  font-size: 0.8rem;
-  margin-bottom: 0;
-  max-width: 760px;
-}
-
 .page-content {
   position: absolute;
   inset: 0;
@@ -310,11 +229,4 @@
   min-height: 0;
   padding-bottom: 0;
   overflow: hidden;
-}
-
-.page-header__meta {
-  display: none;
-  margin-top: var(--space-3);
-  font-size: 0.8rem;
-  color: var(--os-muted);
 }

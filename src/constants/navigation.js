@@ -3,19 +3,8 @@ export const NAV_ITEMS = [
   { id: "notes", label: "Notes", icon: "note" },
 ];
 
-export const PAGE_META = {
-  dashboard: {
-    title: "Home",
-    description: "",
-  },
-  notes: {
-    title: "Notes",
-    description: "",
-  },
-};
-
-export function getPageMeta(pageId) {
-  return PAGE_META[pageId] ?? PAGE_META.dashboard;
+export function getNavigationPage(pageId) {
+  return NAV_ITEMS.find((item) => item.id === pageId) ?? NAV_ITEMS[0];
 }
 
 export function getNavigationDestination(pageId) {

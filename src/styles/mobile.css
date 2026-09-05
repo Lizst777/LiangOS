@@ -47,10 +47,6 @@
     overflow: hidden;
   }
 
-  .page-header {
-    display: none;
-  }
-
   .mobile-header {
     position: fixed;
     top: 0;
@@ -451,15 +447,6 @@
   transform: translateY(-0.5px);
 }
 
-.bottom-nav__item--active {
-  color: var(--os-nav-active-color);
-  opacity: 1;
-}
-
-.bottom-nav__item--active:hover {
-  color: var(--os-nav-active-color);
-}
-
 .bottom-nav__icon {
   flex-shrink: 0;
   width: 16px;
@@ -468,10 +455,6 @@
   align-items: center;
   justify-content: center;
   opacity: 0.62;
-}
-
-.bottom-nav__item--active .bottom-nav__icon {
-  opacity: 0.92;
 }
 
 .bottom-nav__label {

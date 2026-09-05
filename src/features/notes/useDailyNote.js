@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getLocalDateKey } from "./date";
+import { getLocalDateKey } from "../../utils/date";
 import { loadDailyNote, saveDailyNote } from "./dailyNoteRepository";
 import { useNotePersistence } from "./useNotePersistence";
 

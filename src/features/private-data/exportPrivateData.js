@@ -1,5 +1,5 @@
 import { isMissingQuoteMetadata } from "../moments/momentTraceRepository";
-import { getLocalDateKey } from "../notes/date";
+import { getLocalDateKey } from "../../utils/date";
 
 function unwrap(result) {
   if (result.error) throw result.error;

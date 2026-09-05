@@ -1,5 +1,4 @@
 import { lazy, Suspense, useEffect } from "react";
-import PageHeader from "../components/layout/PageHeader";
 import PageTransition from "../components/layout/PageTransition";
 import Sidebar from "../components/layout/Sidebar";
 import BottomNavigation from "../components/layout/BottomNavigation";
@@ -39,7 +38,6 @@ function DashboardShell({
       />
       <main className={`main main--${currentPage}`}>
         <MobileHeader page={currentPage} theme={theme} onThemeToggle={onThemeToggle} />
-        <PageHeader page={currentPage} />
         <PageTransition pageKey="dashboard" isActive={currentPage === "dashboard"}>
           <DashboardView />
         </PageTransition>
