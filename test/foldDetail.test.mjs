@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { detailSize, createDetailViewer } from "../prototypes/fold/detail-viewer.js";
+import { detailSize, createDetailViewer } from "../src/detail-viewer.js";
 
 test("detail sizing fits portrait, square and landscape without clipping", () => {
   for (const ratio of [0.75, 1, 9 / 16]) {

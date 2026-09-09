@@ -5,7 +5,7 @@ import {
   FRAME_RATE,
   frameTiming,
   renderSequence,
-} from "../prototypes/fold/frame-sequence.js";
+} from "../src/frame-sequence.js";
 
 test("fixed timeline contains 300 continuous frames ending at exactly ten seconds", () => {
   assert.equal(FRAME_COUNT, 300);

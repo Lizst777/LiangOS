@@ -1,36 +1,24 @@
 {
-  "name": "liangos-react",
+  "name": "fold-studio",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 127.0.0.1",
     "build": "vite build",
-    "build:fold": "vite build --config vite.fold.config.js",
-    "format": "prettier --write \"**/*.{js,jsx,mjs,json,css,md,html}\"",
-    "format:check": "prettier --check \"**/*.{js,jsx,mjs,json,css,md,html}\"",
+    "preview": "vite preview --host 127.0.0.1",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "quotes:sync": "node scripts/syncDailyQuotes.mjs",
-    "test": "node --test"
+    "format": "prettier --write index.html src test scripts docs *.js *.json *.md",
+    "format:check": "prettier --check index.html src test scripts docs *.js *.json *.md",
+    "test": "node --test",
+    "verify:video": "node scripts/verify-video.mjs"
   },
   "dependencies": {
-    "@supabase/supabase-js": "2.106.2",
-    "@tailwindcss/vite": "^4.3.0",
-    "framer-motion": "^12.38.0",
-    "mediabunny": "1.55.7",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
-    "tailwindcss": "^4.3.0"
+    "mediabunny": "1.55.7"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "6.0.3",
     "eslint": "^10.3.0",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
     "prettier": "^3.9.6",
     "vite": "8.1.4"

@@ -1,12 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
-  createHistory,
-  DEFAULT_DOCUMENT,
-  readDocument,
-} from "../prototypes/fold/work-document.js";
-import { createAutoSave } from "../prototypes/fold/draft-store.js";
-import { createDocumentSession } from "../prototypes/fold/document-session.js";
+import { createHistory, DEFAULT_DOCUMENT, readDocument } from "../src/work-document.js";
+import { createAutoSave } from "../src/draft-store.js";
+import { createDocumentSession } from "../src/document-session.js";
 
 const doc = (patch = {}) => ({ ...DEFAULT_DOCUMENT, ...patch });
 function deferred() {

@@ -1,9 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
-  createEditorPanels,
-  trackEditorViewport,
-} from "../prototypes/fold/editor-panels.js";
+import { createEditorPanels, trackEditorViewport } from "../src/editor-panels.js";
 
 function element(name, ownerDocument) {
   const listeners = {};

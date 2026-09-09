@@ -15,6 +15,12 @@
   force = true
 
 [[redirects]]
+  from = "/prototypes/fold/*"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

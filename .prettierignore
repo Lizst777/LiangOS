@@ -1,9 +1,5 @@
 dist
-dist-fold
 node_modules
 tmp_ai_pdf_preview
 tools
 public
-src/data/dailyQuotes.generated.json
-supabase/config.toml
-supabase/migrations

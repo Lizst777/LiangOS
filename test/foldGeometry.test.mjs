@@ -6,7 +6,7 @@ import {
   sceneAt,
   projectPoint,
   faceNormal,
-} from "../prototypes/fold/geometry.js";
+} from "../src/geometry.js";
 
 test("loop endpoints have identical projected geometry", () => {
   for (const panel of [0, 1, 2]) {

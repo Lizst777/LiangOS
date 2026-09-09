@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createExportDialog } from "../prototypes/fold/export-dialog.js";
+import { createExportDialog } from "../src/export-dialog.js";
 
 function deferred() {
   let resolve;

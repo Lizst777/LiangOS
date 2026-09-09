@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { layoutCaption } from "../prototypes/fold/text-layout.js";
+import { layoutCaption } from "../src/text-layout.js";
 
 function context() {
   return {

@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { Input, ALL_FORMATS, FilePathSource, EncodedPacketSink } from "mediabunny";
-import { FRAME_COUNT, FRAME_RATE } from "./frame-sequence.js";
+import { FRAME_COUNT, FRAME_RATE } from "../src/frame-sequence.js";
 
 const path = process.argv[2];
-if (!path) throw new Error("Usage: node prototypes/fold/verify-video.mjs <video-path>");
+if (!path) throw new Error("Usage: npm run verify:video -- <video-path>");
 const input = new Input({ formats: ALL_FORMATS, source: new FilePathSource(path) });
 try {
   const track = await input.getPrimaryVideoTrack();
