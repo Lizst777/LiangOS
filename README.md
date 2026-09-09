@@ -1,9 +1,14 @@
 # LiangOS
 
-LiangOS is a quiet personal standby space built with React and Vite. The public
-home keeps time, date, weather, and a short Moment in view. Notes and saved
-Moments are private Supabase data protected by authentication and row-level
-security.
+LiangOS is a React and Vite homepage with time, date, live weather, and a daily
+literary quote. Saved Moments remain private Supabase data protected by
+authentication and row-level security.
+
+Notes has been removed, including its navigation, editor, timeline, and export UI.
+Old `#notes` bookmarks open Home. Historical database tables, data, accounts, and
+migrations are retained; removing the frontend does not delete cloud data.
+The existing Moment session and archive code remains, but the retired Notes
+password form is no longer available as a sign-in entry point.
 
 ## Local development
 
@@ -43,9 +48,9 @@ calculates their content hashes as part of the same build.
 - `src/pages`: page-level composition only.
 - `src/features`: domain UI, lifecycle hooks, and data repositories grouped by
   capability.
-- `src/components/layout`: shared page shell and navigation.
+- `src/components/layout`: page shell, appearance controls, and private dialog.
 - `src/ui`: small reusable presentation components and icons.
-- `src/hooks`: application-wide hooks such as navigation, theme, and focus.
+- `src/hooks`: application-wide hooks such as session, theme, and focus.
 - `src/styles`: styles split by responsibility while preserving one explicit
   import order in `src/styles/index.css`.
 - `src/data`: generated quote corpus and its deterministic daily selector.
@@ -58,10 +63,8 @@ excluded from automatic formatting.
 
 - `moments`: public read-only seed phrases.
 - `moment_traces`: Moments saved by the authenticated owner.
-- `daily_notes`: one private note per owner and local calendar date.
-- `daily_note_versions`: automatic private snapshots before content updates.
-- `notes` and `note_versions`: legacy data retained during the daily-note
-  transition.
+- `daily_notes`, `daily_note_versions`, `notes`, and `note_versions`: historical
+  Notes tables retained for data recovery, no longer queried by the frontend.
 
 Database changes are versioned in `supabase/migrations`. Apply pending files
 through the Supabase migration workflow before deploying frontend code that
@@ -71,5 +74,4 @@ RLS enabled; LiangOS migrations do both.
 ## Privacy
 
 Private queries always include the authenticated `user_id` in addition to RLS.
-The frontend does not store Notes or Moments in `localStorage`. Export creates a
-local JSON file containing the private chronological timeline.
+The frontend does not store Moment content in `localStorage`.

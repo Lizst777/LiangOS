@@ -10,15 +10,6 @@ const iconProps = {
   "aria-hidden": true,
 };
 
-export function IconNote() {
-  return (
-    <svg {...iconProps}>
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-      <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
-    </svg>
-  );
-}
-
 export function IconMoon() {
   return (
     <svg {...iconProps}>
@@ -45,29 +36,10 @@ export function IconMonitor() {
   );
 }
 
-export function IconHome() {
-  return (
-    <svg {...iconProps}>
-      <path d="M3 11.5 12 4l9 7.5" />
-      <path d="M5.5 10.5V20h13v-9.5M9.5 20v-6h5v6" />
-    </svg>
-  );
-}
-
 export function IconClose() {
   return (
     <svg {...iconProps}>
       <path d="M18 6 6 18M6 6l12 12" />
     </svg>
   );
-}
-
-const ICON_MAP = {
-  home: IconHome,
-  note: IconNote,
-};
-
-export function NavIcon({ name }) {
-  const Icon = ICON_MAP[name] ?? IconHome;
-  return <Icon />;
 }

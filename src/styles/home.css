@@ -81,14 +81,6 @@
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.42);
 }
 
-.app-shell--dashboard .sidebar__item {
-  color: rgba(255, 255, 255, 0.55);
-}
-
-.app-shell--dashboard .sidebar__item:hover {
-  color: rgba(255, 255, 255, 0.82);
-}
-
 .app-shell--dashboard .sidebar__action {
   color: rgba(255, 255, 255, 0.58);
 }
@@ -102,28 +94,6 @@
   background: rgba(9, 9, 11, 0.9);
   color: rgba(255, 255, 255, 0.94);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
-}
-
-.app-shell--dashboard .bottom-nav__container {
-  border-color: rgba(255, 255, 255, 0.11);
-  background: rgba(9, 9, 11, 0.36);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(20px) saturate(120%);
-  -webkit-backdrop-filter: blur(20px) saturate(120%);
-  opacity: 0.9;
-}
-
-.app-shell--dashboard .bottom-nav:hover .bottom-nav__container,
-.app-shell--dashboard .bottom-nav:focus-within .bottom-nav__container {
-  background: rgba(9, 9, 11, 0.46);
-}
-
-.app-shell--dashboard .bottom-nav__item {
-  color: rgba(255, 255, 255, 0.54);
-}
-
-.app-shell--dashboard .bottom-nav__item:hover {
-  color: rgba(255, 255, 255, 0.94);
 }
 
 /* ===== Time display — pure text hierarchy ===== */

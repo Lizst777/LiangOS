@@ -4,8 +4,7 @@
     transform: none;
   }
 
-  .moment-quote__text,
-  .connection-status__dots span {
+  .moment-quote__text {
     animation: none;
   }
 
@@ -13,9 +12,5 @@
     filter: none;
     opacity: 1;
     transform: none;
-  }
-
-  .connection-status__dots span {
-    opacity: 0.52;
   }
 }

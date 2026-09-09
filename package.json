@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:fold": "vite build --config vite.fold.config.js",
     "format": "prettier --write \"**/*.{js,jsx,mjs,json,css,md,html}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,mjs,json,css,md,html}\"",
     "lint": "eslint .",
@@ -17,6 +18,7 @@
     "@supabase/supabase-js": "2.106.2",
     "@tailwindcss/vite": "^4.3.0",
     "framer-motion": "^12.38.0",
+    "mediabunny": "1.55.7",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "tailwindcss": "^4.3.0"

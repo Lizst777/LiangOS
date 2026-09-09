@@ -1,30 +1,11 @@
-import { getNavigationDestination } from "../../constants/navigation";
-import { NavIcon } from "../../ui/Icons";
 import ThemeIcon from "../../ui/ThemeIcon";
 import { getThemeLabel } from "../../utils/theme";
 
-function Sidebar({ page, theme, onPageChange, onThemeToggle }) {
-  const destination = getNavigationDestination(page);
+function Sidebar({ theme, onThemeToggle }) {
   const themeLabel = getThemeLabel(theme);
 
   return (
-    <aside className="sidebar hidden lg:flex" aria-label="Workspace navigation">
-      <nav className="sidebar__nav" aria-label="Workspace navigation">
-        <button
-          type="button"
-          className="sidebar__item"
-          onClick={() => onPageChange(destination.id)}
-          aria-label={destination.label}
-        >
-          <span className="sidebar__item-icon">
-            <NavIcon name={destination.icon} />
-          </span>
-          <span className="sidebar__tooltip" aria-hidden="true">
-            {destination.label}
-          </span>
-        </button>
-      </nav>
-
+    <aside className="sidebar hidden lg:flex" aria-label="Appearance">
       <div className="sidebar__footer">
         <button
           type="button"

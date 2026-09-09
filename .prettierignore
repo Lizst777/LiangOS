@@ -1,4 +1,5 @@
 dist
+dist-fold
 node_modules
 tmp_ai_pdf_preview
 tools
